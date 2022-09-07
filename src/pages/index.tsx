@@ -1,10 +1,18 @@
-import { Button } from "@chakra-ui/react";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export default function App() {
-  return (
-    <div>
-      <h1 className="text-4xl">Welcome to the Burlap beta!</h1>
-      <Button>Hello!</Button>
-    </div>
-  );
+  const nav = useRouter();
+
+  useEffect(() => {
+    const func = async () => {
+      if (!(await (await import("../../lib/auth")).loggedIn())) {
+        nav.push("/start");
+      }
+    };
+
+    func();
+  });
+  
+  return <h1>hi</h1>
 }

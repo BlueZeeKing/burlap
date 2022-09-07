@@ -12,7 +12,17 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "fs": {
+        "readFile": true,
+        "writeFile": true,
+        "scope": [
+          "$APP/apikey.txt",
+          "$APP"
+        ]
+      },
+      "path": {
+        "all": true
+      }
     },
     "bundle": {
       "active": true,
@@ -29,7 +39,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "dev.blueish.burlap",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
