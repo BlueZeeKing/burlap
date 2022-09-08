@@ -1,6 +1,7 @@
 import { Button, Input } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { saveKey } from "../../lib/auth";
 
 export default function App() {
   const [key, setKey] = useState("")
@@ -20,7 +21,7 @@ export default function App() {
         <div className="px-16 text-center">
           <Input placeholder="API Key" value={key} onChange={e => setKey(e.target.value)} />
           <Button colorScheme="blue" mt="2" onClick={async () => {
-            (await import("../../lib/auth")).saveKey(key);
+            saveKey(key);
             nav.push("/")
           }}>Submit</Button>
         </div>

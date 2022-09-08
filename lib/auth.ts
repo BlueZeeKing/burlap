@@ -1,13 +1,15 @@
-import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
-import { appDir, join } from "@tauri-apps/api/path";
-
 export async function saveKey(key: string): Promise<void> {
+  const { appDir, join } = await import("@tauri-apps/api/path");
+  const { writeTextFile } = await import("@tauri-apps/api/fs");
+
   await writeTextFile(await join(await appDir(), "apikey.txt"), key);
 }
 
 export async function getKey(): Promise<string> {
-  const data = await readTextFile(await join(await appDir(), "apikey.txt"));
-  return data;
+  const { appDir, join } = await import("@tauri-apps/api/path");
+  const { readTextFile } = await import("@tauri-apps/api/fs");
+
+  return await readTextFile(await join(await appDir(), "apikey.txt"));
 }
 
 export async function loggedIn() {

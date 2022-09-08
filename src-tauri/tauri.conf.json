@@ -22,6 +22,15 @@
       },
       "path": {
         "all": true
+      },
+      "http": {
+        "all": true,
+        "request": true,
+        "scope": [
+          "https://apsva.instructure.com/api/*",
+          "https://inst-fs-iad-prod.inscloudgate.net/*",
+          "https://*"
+        ]
       }
     },
     "bundle": {
