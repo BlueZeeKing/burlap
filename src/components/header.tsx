@@ -1,4 +1,4 @@
-import { Avatar } from "@chakra-ui/react";
+import { Avatar, Badge } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { getData } from "../lib/fetch";
@@ -10,8 +10,13 @@ interface User {
   id: number;
 }
 
+interface Unread {
+  unread_count: string;
+}
+
 export default function Header() {
   const { data, isSuccess } = useQuery(["profile"], async () => await getData<User>("users/self/profile"));
+  const unread = useQuery(["unread"], async () => await getData<Unread>("conversations/unread_count"));
 
   return (
     <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex">
@@ -22,9 +27,12 @@ export default function Header() {
       </Link>
       <div className="flex-grow"></div>
       <Link href="messages">
-        <span className="text-blue-500 dark:text-blue-400 cursor-pointer hover:underline grid content-center px-5">
-          Messages
-        </span>
+        <div className="h-full grid content-center px-5">
+          <span className="text-blue-500 dark:text-blue-400 cursor-pointer hover:underline relative">
+            Messages
+            <Badge ml="1" colorScheme="red">{unread.isSuccess && parseInt(unread.data.unread_count) > 0 ? `${unread.data.unread_count} new` : ""}</Badge>
+          </span>
+        </div>
       </Link>
       {isSuccess ? (
         <Link href="/profile">

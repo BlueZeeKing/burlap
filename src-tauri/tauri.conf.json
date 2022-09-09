@@ -31,6 +31,9 @@
           "https://inst-fs-iad-prod.inscloudgate.net/*",
           "https://*"
         ]
+      },
+      "shell": {
+        "open": true
       }
     },
     "bundle": {

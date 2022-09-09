@@ -1,8 +1,11 @@
-import "../global.css"
+import "../global.css";
+
 import { ChakraProvider } from "@chakra-ui/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { loggedIn } from "../lib/auth";
 
 const queryClient = new QueryClient();
@@ -18,7 +21,7 @@ export default function MyApp({ Component, pageProps }) {
 
     func();
   });
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>

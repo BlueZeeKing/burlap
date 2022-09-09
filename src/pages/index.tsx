@@ -1,9 +1,9 @@
-import { Img } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import Header from "../components/header";
 import Loader from "../components/loader";
+
+import { useQuery } from "@tanstack/react-query";
+
 import { getData } from "../lib/fetch";
 
 interface Course {
