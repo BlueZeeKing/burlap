@@ -4,6 +4,9 @@ specifiers:
   '@chakra-ui/react': ^2.3.1
   '@emotion/react': ^11
   '@emotion/styled': ^11
+  '@fortawesome/fontawesome-svg-core': ^6.2.0
+  '@fortawesome/free-solid-svg-icons': ^6.2.0
+  '@fortawesome/react-fontawesome': ^0.2.0
   '@tanstack/react-query': ^4.2.3
   '@tauri-apps/api': ^1.0.2
   '@tauri-apps/cli': ^1.0.5
@@ -23,6 +26,9 @@ dependencies:
   '@chakra-ui/react': 2.3.1_7mjij5crbumslchrl6x6tqkxly
   '@emotion/react': 11.10.4_7v64pk2mkrohwh22gx7lrz5ive
   '@emotion/styled': 11.10.4_kjddpxqkh75n32dccdij3kv22i
+  '@fortawesome/fontawesome-svg-core': 6.2.0
+  '@fortawesome/free-solid-svg-icons': 6.2.0
+  '@fortawesome/react-fontawesome': 0.2.0_6j2wdqxompc6mcokhxkpep2gqu
   '@tanstack/react-query': 4.2.3_biqbaboplfbrettd7655fr4n2y
   '@tauri-apps/api': 1.0.2
   framer-motion: 6.5.1_biqbaboplfbrettd7655fr4n2y
@@ -37,7 +43,7 @@ devDependencies:
   '@types/react-dom': 18.0.6
   autoprefixer: 10.4.8_postcss@8.4.16
   postcss: 8.4.16
-  tailwindcss: 3.1.8_postcss@8.4.16
+  tailwindcss: 3.1.8
   typescript: 4.8.2
 
 packages:
@@ -1230,6 +1236,39 @@ packages:
 
   /@emotion/weak-memoize/0.3.0:
     resolution: {integrity: sha512-AHPmaAx+RYfZz0eYu6Gviiagpmiyw98ySSlQvCUhVGDRtDFe4DBS0x1bSjdF3gqUDYOczB+yYvBTtEylYSdRhg==}
+    dev: false
+
+  /@fortawesome/fontawesome-common-types/6.2.0:
+    resolution: {integrity: sha512-rBevIsj2nclStJ7AxTdfsa3ovHb1H+qApwrxcTVo+NNdeJiB9V75hsKfrkG5AwNcRUNxrPPiScGYCNmLMoh8pg==}
+    engines: {node: '>=6'}
+    requiresBuild: true
+    dev: false
+
+  /@fortawesome/fontawesome-svg-core/6.2.0:
+    resolution: {integrity: sha512-Cf2mAAeMWFMzpLC7Y9H1I4o3wEU+XovVJhTiNG8ZNgSQj53yl7OCJaS80K4YjrABWZzbAHVaoHE1dVJ27AAYXw==}
+    engines: {node: '>=6'}
+    requiresBuild: true
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 6.2.0
+    dev: false
+
+  /@fortawesome/free-solid-svg-icons/6.2.0:
+    resolution: {integrity: sha512-UjCILHIQ4I8cN46EiQn0CZL/h8AwCGgR//1c4R96Q5viSRwuKVo0NdQEc4bm+69ZwC0dUvjbDqAHF1RR5FA3XA==}
+    engines: {node: '>=6'}
+    requiresBuild: true
+    dependencies:
+      '@fortawesome/fontawesome-common-types': 6.2.0
+    dev: false
+
+  /@fortawesome/react-fontawesome/0.2.0_6j2wdqxompc6mcokhxkpep2gqu:
+    resolution: {integrity: sha512-uHg75Rb/XORTtVt7OS9WoK8uM276Ufi7gCzshVWkUJbHhh3svsUUeqXerrM96Wm7fRiDzfKRwSoahhMIkGAYHw==}
+    peerDependencies:
+      '@fortawesome/fontawesome-svg-core': ~1 || ~6
+      react: '>=16.3'
+    dependencies:
+      '@fortawesome/fontawesome-svg-core': 6.2.0
+      prop-types: 15.8.1
+      react: 18.2.0
     dev: false
 
   /@motionone/animation/10.14.0:
@@ -2482,12 +2521,10 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  /tailwindcss/3.1.8_postcss@8.4.16:
+  /tailwindcss/3.1.8:
     resolution: {integrity: sha512-YSneUCZSFDYMwk+TGq8qYFdCA3yfBRdBlS7txSq0LUmzyeqRe3a8fBQzbz9M3WS/iFT4BNf/nmw9mEzrnSaC0g==}
     engines: {node: '>=12.13.0'}
     hasBin: true
-    peerDependencies:
-      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3

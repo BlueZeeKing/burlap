@@ -27,10 +27,10 @@ export default function App() {
 
 function AppView(props: {data: Course[]}) {
   return (
-    <main className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 auto-rows-max bg-zinc-200 dark:bg-zinc-900 gap-6 p-6 w-screen">
+    <main className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 auto-rows-max bg gap-6 p-6 w-screen">
       {props.data.map((item) => (
         <Link key={item.id} href={`/course/${item.id}/modules`}>
-          <div className="p-6 bg-white dark:bg-zinc-800 rounded border-zinc-700 border cursor-pointer">
+          <div className="p-6 bg-white dark:bg-zinc-800 rounded border-zinc-300 dark:border-zinc-700 border cursor-pointer">
             <h2 className="text-xl">{item.shortName}</h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
               {item.courseCode}

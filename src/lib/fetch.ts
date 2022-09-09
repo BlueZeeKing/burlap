@@ -10,5 +10,7 @@ export async function getData<T>(url: string) {
     },
   });
 
+  if (!body.ok) throw body.status
+
   return body.data as T
 }

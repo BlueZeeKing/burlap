@@ -14,9 +14,11 @@ export default function Header() {
   const { data, isSuccess } = useQuery(["profile"], async () => await getData<User>("users/self/profile"));
 
   return (
-    <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-700 flex">
+    <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex">
       <Link href="/">
-        <h1 className="text-3xl pl-6 grid content-center cursor-pointer">Burlap</h1>
+        <h1 className="text-3xl pl-6 grid content-center cursor-pointer">
+          Burlap
+        </h1>
       </Link>
       <div className="flex-grow"></div>
       <Link href="messages">

@@ -11,7 +11,7 @@ export default function MyApp({ Component, pageProps }) {
   const nav = useRouter();
   useEffect(() => {
     const func = async () => {
-      if (!(await loggedIn())) {
+      if (!(await loggedIn()) && nav.pathname != "/start") {
         nav.push("/start");
       }
     };
