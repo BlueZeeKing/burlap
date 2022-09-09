@@ -13,16 +13,14 @@ interface User {
 export default function Header() {
   const { data, isSuccess } = useQuery(["profile"], async () => await getData<User>("users/self/profile"));
 
-  console.log(data);
-
   return (
-    <div className="h-24 bg-white border-b border-zinc-300 flex">
+    <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-700 flex">
       <Link href="/">
         <h1 className="text-3xl pl-6 grid content-center cursor-pointer">Burlap</h1>
       </Link>
       <div className="flex-grow"></div>
       <Link href="messages">
-        <span className="text-blue-500 cursor-pointer hover:underline grid content-center px-5">
+        <span className="text-blue-500 dark:text-blue-400 cursor-pointer hover:underline grid content-center px-5">
           Messages
         </span>
       </Link>
