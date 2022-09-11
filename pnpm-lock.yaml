@@ -9,6 +9,7 @@ specifiers:
   '@fortawesome/react-fontawesome': ^0.2.0
   '@tailwindcss/typography': ^0.5.7
   '@tanstack/react-query': ^4.2.3
+  '@tanstack/react-query-devtools': ^4.3.4
   '@tauri-apps/api': ^1.0.2
   '@tauri-apps/cli': ^1.0.5
   '@types/node': ^18.7.11
@@ -32,6 +33,7 @@ dependencies:
   '@fortawesome/free-solid-svg-icons': 6.2.0
   '@fortawesome/react-fontawesome': 0.2.0_6j2wdqxompc6mcokhxkpep2gqu
   '@tanstack/react-query': 4.2.3_biqbaboplfbrettd7655fr4n2y
+  '@tanstack/react-query-devtools': 4.3.4_7jugwuuqrrr4f74u7dtzjsintq
   '@tauri-apps/api': 1.0.2
   framer-motion: 6.5.1_biqbaboplfbrettd7655fr4n2y
   isomorphic-dompurify: 0.22.0
@@ -1486,8 +1488,29 @@ packages:
       tailwindcss: 3.1.8
     dev: true
 
+  /@tanstack/match-sorter-utils/8.1.1:
+    resolution: {integrity: sha512-IdmEekEYxQsoLOR0XQyw3jD1GujBpRRYaGJYQUw1eOT1eUugWxdc7jomh1VQ1EKHcdwDLpLaCz/8y4KraU4T9A==}
+    engines: {node: '>=12'}
+    dependencies:
+      remove-accents: 0.4.2
+    dev: false
+
   /@tanstack/query-core/4.2.3:
     resolution: {integrity: sha512-zdt5lYWs1dZaA3IxJbCgtAfHZJScRZONpiLL7YkeOkrme5MfjQqTpjq7LYbzpyuwPOh2Jx68le0PLl57JFv5hQ==}
+    dev: false
+
+  /@tanstack/react-query-devtools/4.3.4_7jugwuuqrrr4f74u7dtzjsintq:
+    resolution: {integrity: sha512-gAn4F0SxaOFgURpO2qaPlUKfm0elKLbJbPnFFFLvlKe1HjcbSrQUzBbC/Lp9g2l/fPq/AGTiB0hFJtpEwCuQBA==}
+    peerDependencies:
+      '@tanstack/react-query': 4.3.4
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@tanstack/match-sorter-utils': 8.1.1
+      '@tanstack/react-query': 4.2.3_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
     dev: false
 
   /@tanstack/react-query/4.2.3_biqbaboplfbrettd7655fr4n2y:
@@ -2785,6 +2808,10 @@ packages:
 
   /regenerator-runtime/0.13.9:
     resolution: {integrity: sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==}
+    dev: false
+
+  /remove-accents/0.4.2:
+    resolution: {integrity: sha512-7pXIJqJOq5tFgG1A2Zxti3Ht8jJF337m4sowbuHsW30ZnkQFnDzy9qBNhgzX8ZLW4+UBcXiiR7SwR6pokHsxiA==}
     dev: false
 
   /requires-port/1.0.0:

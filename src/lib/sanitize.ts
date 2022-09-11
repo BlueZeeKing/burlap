@@ -16,7 +16,7 @@ export default function clean(html: string, ref: MutableRefObject<HTMLDivElement
     } else if (e.style.getPropertyValue("background-color") != "" && isLink(e)) {
       e.style.setProperty("background-color", "")
       e.classList.add("font-bold");
-      e.firstElementChild.classList.add("font-bold");
+      e.firstElementChild?.classList.add("font-bold");
     }
     if (e.style.getPropertyValue("font-size") != "") {
       let size = parseInt(e.style.getPropertyValue("font-size"));

@@ -2,17 +2,7 @@ import { Avatar, Badge } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { getData } from "../lib/fetch";
-
-interface User {
-  avatar_url: string;
-  short_name: string;
-  pronouns: string;
-  id: number;
-}
-
-interface Unread {
-  unread_count: string;
-}
+import { User, Unread } from "../types/api";
 
 export default function Header() {
   const { data, isSuccess } = useQuery(["profile"], async () => await getData<User>("users/self/profile"));

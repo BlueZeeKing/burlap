@@ -5,14 +5,7 @@ import Header from "../../../../components/header";
 import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import { getData } from "../../../../lib/fetch";
-
-interface Assignment {
-  id: number;
-  title: string;
-  message: string;
-  posted_at: string;
-  delayed_post_at: string | null;
-}
+import { Assignment } from "../../../../types/api";
 
 export default function Assignment() {
   const router = useRouter();
@@ -45,7 +38,7 @@ function AssignmentView(props: { data: Assignment[] }) {
             "/"
           )}
         >
-          {item.title}
+          {item.name}
         </Link>
       ))}
     </main>

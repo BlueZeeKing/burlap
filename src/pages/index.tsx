@@ -5,19 +5,48 @@ import Loader from "../components/loader";
 import { useQuery } from "@tanstack/react-query";
 
 import { getData } from "../lib/fetch";
-
-interface Course {
-  image: string;
-  courseCode: string;
-  shortName: string;
-  id: number;
-  defaultView: DefaultView;
-}
-
-type DefaultView = "feed" | "wiki" | "modules" | "assignments" | "syllabus";
+import { queryClient } from "./_app";
+import { Page, Course, Module, Assignment, Tab } from "../types/api";
 
 export default function App() {
-  const {data, isSuccess} = useQuery(["dashboard"], async () => await getData<Course[]>("dashboard/dashboard_cards"))
+  const {data, isSuccess} = useQuery(["dashboard"], async () => await getData<Course[]>("dashboard/dashboard_cards"), {onSuccess: (data) => {
+    data.forEach((item) => {
+      queryClient.prefetchQuery(
+        ["courses", item.id.toString(), "tabs"],
+        async () =>
+          getData<Tab[]>(`courses/${item.id}/tabs`)
+      );
+
+      switch (item.defaultView) {
+        case "wiki":
+          queryClient.prefetchQuery(
+            ["courses", item.id.toString(), "front_page"],
+            async () => getData<Page>(`courses/${item.id}/front_page`)
+          );
+          return;
+        case "modules":
+          queryClient.prefetchQuery(
+            ["courses", item.id.toString(), "modules"],
+            async () =>
+              getData<Module[]>(`courses/${item.id}/modules?include=items`)
+          );
+          return;
+        case "assignments":
+          queryClient.prefetchQuery(
+            ["courses", item.id.toString(), "assignments"],
+            async () => getData<Assignment[]>(`courses/${item.id}/assignments`)
+          );
+          return;
+        case "syllabus":
+          queryClient.prefetchQuery(
+            ["courses", item.id.toString(), "syllabus"],
+            async () =>
+              getData<Module[]>(`courses/${item.id}?include=syllabus_body`)
+          );
+          return;
+      }
+    })
+  }})
 
   return (
     <div>

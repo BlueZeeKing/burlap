@@ -20,24 +20,7 @@ import { NextRouter, useRouter } from "next/router";
 import { getData } from "../../../lib/fetch";
 import { CourseLayout } from "../../../components/layout";
 
-interface Module {
-  id: number;
-  name: string;
-  items: Item[];
-  position: number;
-}
-
-interface Item {
-  id: number;
-  content_id: number;
-  indent: number;
-  title: string;
-  type: Type;
-  external_url: string;
-  page_url: string;
-}
-
-type Type = 'File' | 'Page' | 'Discussion' | 'Assignment' | 'Quiz' | 'SubHeader' | 'ExternalUrl' | 'ExternalTool'
+import { Module, Item, Type } from "../../../types/api";
 
 export default function Modules() {
   const router = useRouter()

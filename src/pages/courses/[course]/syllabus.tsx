@@ -5,17 +5,13 @@ import { CourseLayout } from "../../../components/layout";
 import Loader from "../../../components/loader";
 import Sanitizer from "../../../components/sanitize";
 import { getData } from "../../../lib/fetch";
+import { Course } from "../../../types/api";
 
-interface Course {
-  id: number;
-  syllabus_body: string;
-}
-
-export default function Page() {
+export default function Syllabus() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
-    ["courses", router.query.course],
+    ["courses", router.query.course, "syllabus"],
     async () => getData<Course>(`courses/${router.query.course}?include=syllabus_body`)
   );
 

@@ -5,19 +5,7 @@ import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import Sanitizer from "../../../../components/sanitize";
 import { getData } from "../../../../lib/fetch";
-
-interface Assignment {
-  id: number;
-  name: string;
-  description: string;
-  created_at: string;
-  due_at: string;
-  submission_types: SubmissionType[];
-  has_submitted_submissions: boolean;
-
-}
-
-type SubmissionType = 'discussion_topic' | 'online_quiz' | 'on_paper' | 'none' | 'external_tool' | 'online_text_entry' | 'online_url' | 'online_upload' | 'media_recording' | 'student_annotation'
+import { Assignment } from "../../../../types/api";
 
 export default function Assignment() {
   const router = useRouter();

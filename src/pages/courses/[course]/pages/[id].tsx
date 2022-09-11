@@ -5,16 +5,9 @@ import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import Sanitizer from "../../../../components/sanitize";
 import { getData } from "../../../../lib/fetch";
+import { Page } from "../../../../types/api";
 
-interface Page {
-  page_id: number;
-  title: string;
-  body: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export default function Page() {
+export default function PageApp() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
