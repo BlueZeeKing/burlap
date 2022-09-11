@@ -16,7 +16,6 @@ import Loader from "../../../components/loader";
 
 import { useQuery } from "@tanstack/react-query";
 import { NextRouter, useRouter } from "next/router";
-import { ReactNode, useState } from "react";
 
 import { getData } from "../../../lib/fetch";
 
@@ -34,6 +33,7 @@ interface Item {
   title: string;
   type: Type;
   external_url: string;
+  page_url: string;
 }
 
 type Type = 'File' | 'Page' | 'Discussion' | 'Assignment' | 'Quiz' | 'SubHeader' | 'ExternalUrl' | 'ExternalTool'
@@ -147,7 +147,7 @@ function ItemWrapper(props: { children: JSX.Element; data: Item; router: NextRou
     case "File":
       return <Link href="/">{children}</Link>;
     case "Page":
-      return <Link href="/">{children}</Link>;
+      return <Link href={["/course", router.query.course, "page", data.page_url].join("/")}>{children}</Link>;
     case "Quiz":
       return <Link href="/">{children}</Link>;
     case "SubHeader":

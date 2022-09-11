@@ -13,3 +13,7 @@
     @apply bg-zinc-200 dark:bg-zinc-900
   }
 }
+
+.screenreader-only {
+    display: none;
+  }

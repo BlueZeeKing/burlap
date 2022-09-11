@@ -1,21 +1,8 @@
-import { Text, useDisclosure, Heading } from "@chakra-ui/react";
-import {
-  faChevronDown,
-  faChevronUp,
-  faPenRuler,
-  faFile,
-  faLink,
-  faNewspaper,
-  faComment,
-  faSquareCheck,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, useState } from "react";
 import Header from "../../../../components/header";
 import Loader from "../../../../components/loader";
+import Sanitizer from "../../../../components/sanitize";
 import { getData } from "../../../../lib/fetch";
 
 interface Assignment {
@@ -51,9 +38,8 @@ export default function Assignment() {
 
 function AssignmentView(props: { data: Assignment }) {
   const { data } = props
+
   return (
-    <main className="bg p-6 flex flex-col space-y-6">
-      <h2>{data.name}</h2>
-    </main>
+    <Sanitizer html={data.description} />
   );
 }
