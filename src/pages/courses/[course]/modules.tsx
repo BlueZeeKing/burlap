@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { NextRouter, useRouter } from "next/router";
 
 import { getData } from "../../../lib/fetch";
+import { CourseLayout } from "../../../components/layout";
 
 interface Module {
   id: number;
@@ -42,16 +43,14 @@ export default function Modules() {
   const router = useRouter()
 
   const { isSuccess, data } = useQuery(
-    ["course", router.query.course, "modules"],
+    ["courses", router.query.course, "modules"],
     async () => getData<Module[]>(`courses/${router.query.course}/modules?include=items`)
   );
 
   return (
-    <div>
-      <Header />
-
-      {isSuccess ? <ModulesView data={data} /> : <Loader />}
-    </div>
+    <CourseLayout isSuccess={isSuccess}>
+      <ModulesView data={data} />
+    </CourseLayout>
   );
 }
 
@@ -67,8 +66,6 @@ function ModulesView(props: {data: Module[]}) {
 
 function Module(props: {module: Module; router: NextRouter}) {
   const { isOpen, onToggle } = useDisclosure()
-
-  console.log(props.module)
 
   return (
     <div>
@@ -97,15 +94,19 @@ function Module(props: {module: Module; router: NextRouter}) {
                 {item.title}
               </Heading>
             ) : (
-              <ItemWrapper data={item} router={props.router}>
+              <ItemWrapper data={item} router={props.router} key={item.id}>
                 <Text
                   cursor="pointer"
                   className="hover:underline"
                   p="4"
                   pl={4 + item.indent * 4}
-                  key={item.id}
                 >
-                  {<FontAwesomeIcon icon={getIcon(item.type)} className="pr-4 pl-2" />}
+                  {
+                    <FontAwesomeIcon
+                      icon={getIcon(item.type)}
+                      className="pr-4 pl-2"
+                    />
+                  }
                   {item.title}
                 </Text>
               </ItemWrapper>
@@ -137,7 +138,7 @@ function ItemWrapper(props: { children: JSX.Element; data: Item; router: NextRou
 
   switch (data.type) {
     case "Assignment":
-      return <Link href={["/course", router.query.course, "assignment", data.content_id].join("/")}>{children}</Link>;
+      return <Link href={["/courses", router.query.course, "assignments", data.content_id].join("/")}>{children}</Link>;
     case "Discussion":
       return <Link href="/">{children}</Link>;
     case "ExternalTool":
@@ -147,7 +148,7 @@ function ItemWrapper(props: { children: JSX.Element; data: Item; router: NextRou
     case "File":
       return <Link href="/">{children}</Link>;
     case "Page":
-      return <Link href={["/course", router.query.course, "page", data.page_url].join("/")}>{children}</Link>;
+      return <Link href={["/courses", router.query.course, "pages", data.page_url].join("/")}>{children}</Link>;
     case "Quiz":
       return <Link href="/">{children}</Link>;
     case "SubHeader":

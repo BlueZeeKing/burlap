@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import Header from "../../../../components/header";
+import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import Sanitizer from "../../../../components/sanitize";
 import { getData } from "../../../../lib/fetch";
@@ -17,7 +18,7 @@ export default function Announcement() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
-    ["course", router.query.course, "announcement", router.query.id],
+    ["courses", router.query.course, "announcements", router.query.id],
     async () =>
       getData<Announcement>(
         `courses/${router.query.course}/discussion_topics/${router.query.id}`
@@ -25,11 +26,9 @@ export default function Announcement() {
   );
 
   return (
-    <div>
-      <Header />
-
-      {isSuccess ? <AnnouncementView data={data} /> : <Loader />}
-    </div>
+    <CourseLayout isSuccess={isSuccess}>
+      <AnnouncementView data={data} />
+    </CourseLayout>
   );
 }
 

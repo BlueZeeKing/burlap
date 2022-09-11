@@ -49,14 +49,14 @@ function getURL(data: Course): string {
 
   switch (data.defaultView) {
     case "feed":
-      return `/course/${data.id}/feed`
+      return `/courses/${data.id}/feed`
     case "wiki":
-      return `/course/${data.id}/home`
+      return `/courses/${data.id}/home`
     case "modules":
-      return `/course/${data.id}/modules`
+      return `/courses/${data.id}/modules`
     case "assignments":
-      return `/course/${data.id}/assignment`
+      return `/courses/${data.id}/assignments`
     case "syllabus":
-      return `/course/${data.id}/syllabus`
+      return `/courses/${data.id}/syllabus`
   }
 }

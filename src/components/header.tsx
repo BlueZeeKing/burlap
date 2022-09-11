@@ -19,7 +19,7 @@ export default function Header() {
   const unread = useQuery(["unread"], async () => await getData<Unread>("conversations/unread_count"));
 
   return (
-    <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex">
+    <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex col-span-2">
       <Link href="/">
         <h1 className="text-3xl pl-6 grid content-center cursor-pointer">
           Burlap

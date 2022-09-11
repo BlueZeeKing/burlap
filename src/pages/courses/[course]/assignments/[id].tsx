@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import Header from "../../../../components/header";
+import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import Sanitizer from "../../../../components/sanitize";
 import { getData } from "../../../../lib/fetch";
@@ -22,17 +23,15 @@ export default function Assignment() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
-    ["course", router.query.course, "assignment", router.query.id],
+    ["courses", router.query.course, "assignments", router.query.id],
     async () =>
       getData<Assignment>(`courses/${router.query.course}/assignments/${router.query.id}`)
   );
 
   return (
-    <div>
-      <Header />
-
-      {isSuccess ? <AssignmentView data={data} /> : <Loader />}
-    </div>
+    <CourseLayout isSuccess={isSuccess}>
+      <AssignmentView data={data} />
+    </CourseLayout>
   );
 }
 

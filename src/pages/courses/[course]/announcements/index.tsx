@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Header from "../../../../components/header";
+import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import { getData } from "../../../../lib/fetch";
 
@@ -17,7 +18,7 @@ export default function Announcement() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
-    ["course", router.query.course, "announcement"],
+    ["courses", router.query.course, "announcements"],
     async () =>
       getData<Announcement[]>(
         `courses/${router.query.course}/discussion_topics?only_announcements=true`
@@ -25,11 +26,9 @@ export default function Announcement() {
   );
 
   return (
-    <div>
-      <Header />
-
-      {isSuccess ? <AnnouncementView data={data} /> : <Loader />}
-    </div>
+    <CourseLayout isSuccess={isSuccess}>
+      <AnnouncementView data={data} />
+    </CourseLayout>
   );
 }
 
@@ -41,7 +40,7 @@ function AnnouncementView(props: { data: Announcement[] }) {
   return (
     <main className="bg p-6 flex flex-col space-y-6">
       {data.map((item) => (
-        <Link href={["/course", router.query.course, "announcement", item.id].join("/")}>{item.title}</Link>
+        <Link href={["/courses", router.query.course, "announcements", item.id].join("/")}>{item.title}</Link>
       ))}
     </main>
   );

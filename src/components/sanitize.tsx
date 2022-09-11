@@ -9,8 +9,8 @@ export default function Sanitizer(props: { html: string; header?: ReactNode}) {
   }, [props.html]);
 
   return (
-    <main className="bg p-6 flex flex-col space-y-6 place-items-center px-24">
-      <div className="prose dark:prose-invert bg-zinc-800 p-8 md:prose-lg lg:prose-xl max-w-[100ch]">
+    <main className="bg p-6 flex flex-col space-y-6 place-items-center">
+      <div className="prose dark:prose-invert bg-zinc-800 p-8 md:prose-lg lg:prose-xl max-w-[75ch]">
         {
           props.header != null ? (
             <>

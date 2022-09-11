@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Header from "../../../../components/header";
+import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import { getData } from "../../../../lib/fetch";
 
@@ -17,7 +18,7 @@ export default function Assignment() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
-    ["course", router.query.course, "assignment"],
+    ["courses", router.query.course, "assignments"],
     async () =>
       getData<Assignment[]>(
         `courses/${router.query.course}/assignments`
@@ -25,11 +26,9 @@ export default function Assignment() {
   );
 
   return (
-    <div>
-      <Header />
-
-      {isSuccess ? <AssignmentView data={data} /> : <Loader />}
-    </div>
+    <CourseLayout isSuccess={isSuccess}>
+      <AssignmentView data={data} />
+    </CourseLayout>
   );
 }
 
@@ -42,7 +41,7 @@ function AssignmentView(props: { data: Assignment[] }) {
     <main className="bg p-6 flex flex-col space-y-6">
       {data.map((item) => (
         <Link
-          href={["/course", router.query.course, "announcement", item.id].join(
+          href={["/courses", router.query.course, "assignments", item.id].join(
             "/"
           )}
         >
