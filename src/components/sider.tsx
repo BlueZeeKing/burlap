@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { getData } from "../lib/fetch";
-import { Tab } from "../types/api";
+import { queryClient } from "../pages/_app";
+import { Tab, Module, Assignment, Announcement } from "../types/api";
 
 export default function SidebarWrapper(props: {children: ReactNode}) {
   return (
@@ -21,6 +22,32 @@ function Sidebar() {
     ["courses", router.query.course, "tabs"],
     async () => await getData<Tab[]>(`courses/${router.query.course}/tabs`)
   );
+
+  useEffect(() => {
+    queryClient.prefetchQuery(
+      ["courses", router.query.course, "modules"],
+      async () =>
+        getData<Module[]>(
+          `courses/${router.query.course}/modules?include=items`
+        )
+    );
+
+    queryClient.prefetchQuery(
+      ["courses", router.query.course, "assignments"],
+      async () =>
+        getData<Assignment[]>(
+          `courses/${router.query.course}/assignments`
+        )
+    );
+
+    queryClient.prefetchQuery(
+      ["courses", router.query.course, "announcements"],
+      async () =>
+        getData<Announcement[]>(
+          `courses/${router.query.course}/discussion_topics?only_announcements=true`
+        )
+    );
+  }, [])
 
   return (
     <aside className="bg-zinc-700 w-72">
@@ -47,7 +74,6 @@ function Sidebar() {
 function getURL(data: Tab, courseId: string) {
   if (data.type == "internal") {
     switch (data.id) {
-      case "home": return "/"
       default: return data.html_url
     }
   } else {

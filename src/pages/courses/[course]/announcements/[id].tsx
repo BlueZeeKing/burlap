@@ -7,7 +7,7 @@ import Sanitizer from "../../../../components/sanitize";
 import { getData } from "../../../../lib/fetch";
 import { Announcement } from "../../../../types/api";
 
-export default function Announcement() {
+export default function AnnouncementPage() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(

@@ -4,7 +4,9 @@ import { MutableRefObject } from "react";
 export default function clean(html: string, ref: MutableRefObject<HTMLDivElement>) {
   ref.current.innerHTML = sanitize(html)
   ref.current.querySelectorAll("a").forEach((a) => {
-    a.target = "_blank"
+    if (a.href.startsWith("http")) {
+      a.target = "_blank"
+    }
     a.classList.add("text-sky-400")
   })
   for (let item of ref.current.getElementsByTagName("*")) {

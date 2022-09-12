@@ -7,7 +7,7 @@ import Loader from "../../../../components/loader";
 import { getData } from "../../../../lib/fetch";
 import { Assignment } from "../../../../types/api";
 
-export default function Assignment() {
+export default function AssignmentList() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(

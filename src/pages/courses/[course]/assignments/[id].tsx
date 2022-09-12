@@ -7,7 +7,7 @@ import Sanitizer from "../../../../components/sanitize";
 import { getData } from "../../../../lib/fetch";
 import { Assignment } from "../../../../types/api";
 
-export default function Assignment() {
+export default function AssignmentPage() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(

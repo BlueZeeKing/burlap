@@ -1,9 +1,16 @@
-export interface Course {
+export interface DashboardCourse {
   image: string;
   courseCode: string;
   shortName: string;
   id: number;
   defaultView: DefaultView;
+}
+
+export interface Course {
+  course_code: string;
+  name: string;
+  id: number;
+  default_view: DefaultView;
   syllabus_body: string;
 }
 

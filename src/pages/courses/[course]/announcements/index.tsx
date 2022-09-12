@@ -7,7 +7,7 @@ import Loader from "../../../../components/loader";
 import { getData } from "../../../../lib/fetch";
 import { Announcement } from "../../../../types/api";
 
-export default function Announcement() {
+export default function AnnouncementList() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
