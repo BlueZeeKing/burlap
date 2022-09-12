@@ -101,3 +101,12 @@ export type SubmissionType =
   | "online_upload"
   | "media_recording"
   | "student_annotation";
+
+export type LinkType = "Assignment"
+| "Discussion"
+| "Page"
+| "File"
+| "Folder"
+| "Quiz"
+| "Module"
+| "SessionlessLaunchUrl"

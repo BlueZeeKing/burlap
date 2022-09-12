@@ -1,9 +1,11 @@
+import { Avatar } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import Header from "../../../../components/header";
 import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import Sanitizer from "../../../../components/sanitize";
+import { parseDate } from "../../../../lib/date";
 import { getData } from "../../../../lib/fetch";
 import { Announcement } from "../../../../types/api";
 
@@ -29,6 +31,14 @@ function AnnouncementView(props: { data: Announcement }) {
   const { data } = props;
 
   return (
-    <Sanitizer html={data.message} />
+    <Sanitizer
+      html={data.message}
+      header={
+        <div>
+          <h2 className="!mb-3 !mt-6">{data.title}</h2>
+          <p>{parseDate(data.delayed_post_at != null ? data.delayed_post_at: data.posted_at)}</p>
+        </div>
+      }
+    />
   );
 }

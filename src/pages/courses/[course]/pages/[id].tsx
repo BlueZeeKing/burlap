@@ -27,6 +27,13 @@ function PageView(props: { data: Page }) {
   const { data } = props
 
   return (
-    <Sanitizer html={data.body} />
+    <Sanitizer
+      html={data.body}
+      header={
+        <div>
+          <h2 className="!mb-3 !mt-6">{data.title}</h2>
+        </div>
+      }
+    />
   );
 }
