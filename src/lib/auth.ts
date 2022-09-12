@@ -1,7 +1,8 @@
 export async function saveKey(key: string): Promise<void> {
   const { appDir, join } = await import("@tauri-apps/api/path");
-  const { writeTextFile } = await import("@tauri-apps/api/fs");
+  const { writeTextFile, createDir } = await import("@tauri-apps/api/fs");
 
+  await createDir(await appDir());
   await writeTextFile(await join(await appDir(), "apikey.txt"), key);
 }
 
