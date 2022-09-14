@@ -35,6 +35,9 @@
       },
       "shell": {
         "open": true
+      },
+      "dialog": {
+        "save": true
       }
     },
     "bundle": {

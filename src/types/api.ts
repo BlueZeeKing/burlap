@@ -110,3 +110,13 @@ export type LinkType = "Assignment"
 | "Quiz"
 | "Module"
 | "SessionlessLaunchUrl"
+
+export interface File {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  display_name: string;
+  url: string;
+  "content-type": string;
+  filename: string;
+}
