@@ -64,7 +64,7 @@ function Module(props: {module: Module; router: NextRouter}) {
         </div>
       </div>
       {isOpen ? (
-        <div className="bg-[#222224] -translate-y-1 z-10 relative pt-1 rounded-b mx-1">
+        <div className="bg-zinc-100 dark:bg-[#222224] -translate-y-1 z-10 relative pt-1 rounded-b mx-1">
           {props.module.items.map((item) =>
             item.type == "SubHeader" ? (
               <Heading

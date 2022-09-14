@@ -50,7 +50,7 @@ function Sidebar() {
   }, [])
 
   return (
-    <aside className="bg-zinc-700 w-72 basis-72">
+    <aside className="bg-zinc-100 dark:bg-zinc-700 w-72 basis-72">
       {data
         ?.sort((item) => item.position)
         .map((item) => (
