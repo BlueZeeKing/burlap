@@ -10,6 +10,9 @@ import { Button } from "@chakra-ui/react";
 import { save } from "@tauri-apps/api/dialog";
 import { writeBinaryFile } from "@tauri-apps/api/fs";
 import { useState } from "react";
+import SequenceButtons from "../../../../components/sequencebuttons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
 
@@ -24,6 +27,7 @@ export default function FilePage() {
 
 function FileView(props: {data: File}) {
   const [numPages, setNumPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   function removeTextLayerOffset() {
     const textLayers = document.querySelectorAll(
@@ -39,6 +43,18 @@ function FileView(props: {data: File}) {
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
+  }
+
+  function decrement() {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage-1)
+    }
+  }
+
+  function increment() {
+    if (currentPage < numPages) {
+      setCurrentPage(currentPage+1)
+    }
   }
   
   return (
@@ -59,7 +75,7 @@ function FileView(props: {data: File}) {
             px="6"
             onClick={async () => {
               const path = await save({ defaultPath: props.data.filename });
-              if (path == null) return
+              if (path == null) return;
               const file = await (await fetch(props.data.url)).arrayBuffer();
               await writeBinaryFile({
                 path: path,
@@ -72,23 +88,56 @@ function FileView(props: {data: File}) {
         </div>
       </header>
       <hr className="mx-16" />
-      <Document file={props.data.url} onLoadSuccess={onDocumentLoadSuccess}>
-        {
-          Array.apply(null, { length: numPages })
-            .map(Number.call, Number)
-            .map((item, index) =>
-              item == null ? (
-                ""
-              ) : (
-                <Page
-                  onLoadSuccess={removeTextLayerOffset}
-                  pageNumber={index + 1}
-                  className="m-8"
-                />
+      <div className="flex">
+        {numPages > 3 ? (
+          <div className="place-content-center grid p-8">
+            <Button>
+              <FontAwesomeIcon
+                icon={faChevronLeft}
+                onClick={() => decrement()}
+              />
+            </Button>
+          </div>
+        ) : (
+          ""
+        )}
+        <Document file={props.data.url} onLoadSuccess={onDocumentLoadSuccess}>
+          {numPages < 3 ? (
+            Array.apply(null, { length: numPages })
+              .map(Number.call, Number)
+              .map((item, index) =>
+                item == null ? (
+                  ""
+                ) : (
+                  <Page
+                    onLoadSuccess={removeTextLayerOffset}
+                    pageNumber={index + 1}
+                    className="m-8"
+                  />
+                )
               )
-            )
-        }
-      </Document>
+          ) : (
+            <Page
+              onLoadSuccess={removeTextLayerOffset}
+              pageNumber={currentPage}
+              className="m-8"
+            />
+          )}
+        </Document>
+        {numPages > 3 ? (
+          <div className="place-content-center grid p-8">
+            <Button>
+              <FontAwesomeIcon
+                icon={faChevronRight}
+                onClick={() => increment()}
+              />
+            </Button>
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
+      <SequenceButtons />
     </main>
   );
 }

@@ -4,6 +4,7 @@ import Header from "../../../../components/header";
 import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import Sanitizer from "../../../../components/sanitize";
+import SequenceButtons from "../../../../components/sequencebuttons";
 import { getData } from "../../../../lib/fetch";
 import { Page } from "../../../../types/api";
 
@@ -27,13 +28,16 @@ function PageView(props: { data: Page }) {
   const { data } = props
 
   return (
-    <Sanitizer
-      html={data.body}
-      header={
-        <div>
-          <h2 className="!mb-3 !mt-6">{data.title}</h2>
-        </div>
-      }
-    />
+    <div>
+      <Sanitizer
+        html={data.body}
+        header={
+          <div>
+            <h2 className="!mb-3 !mt-6">{data.title}</h2>
+          </div>
+        }
+      />
+      <SequenceButtons />
+    </div>
   );
 }

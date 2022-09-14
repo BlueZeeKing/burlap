@@ -5,6 +5,7 @@ import Header from "../../../../components/header";
 import { CourseLayout } from "../../../../components/layout";
 import Loader from "../../../../components/loader";
 import Sanitizer from "../../../../components/sanitize";
+import SequenceButtons from "../../../../components/sequencebuttons";
 import { parseDate } from "../../../../lib/date";
 import { getData } from "../../../../lib/fetch";
 import { Assignment } from "../../../../types/api";
@@ -31,14 +32,17 @@ function AssignmentView(props: { data: Assignment }) {
   console.log(data)
 
   return (
-    <Sanitizer
-      header={
-        <div>
-          <h2 className="!mb-3 !mt-6">{data.name}</h2>
-          <p>{parseDate(data.due_at)}</p>
-        </div>
-      }
-      html={data.description}
-    />
+    <div>
+      <Sanitizer
+        header={
+          <div>
+            <h2 className="!mb-3 !mt-6">{data.name}</h2>
+            <p>{parseDate(data.due_at)}</p>
+          </div>
+        }
+        html={data.description}
+      />
+      <SequenceButtons />
+    </div>
   );
 }

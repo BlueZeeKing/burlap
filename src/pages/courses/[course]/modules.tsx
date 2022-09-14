@@ -21,13 +21,14 @@ import { getData } from "../../../lib/fetch";
 import { CourseLayout } from "../../../components/layout";
 
 import { Module, Item, Type } from "../../../types/api";
+import { queryClient } from "../../_app";
 
 export default function Modules() {
   const router = useRouter()
 
   const { isSuccess, data } = useQuery(
     ["courses", router.query.course, "modules"],
-    async () => getData<Module[]>(`courses/${router.query.course}/modules?include=items`)
+    async () => getData<Module[]>(`courses/${router.query.course}/modules?include=items`),
   );
 
   return (
@@ -116,12 +117,12 @@ function getIcon(type: Type) {
   }
 }
 
-function ItemWrapper(props: { children: JSX.Element; data: Item; router: NextRouter }): JSX.Element {
+export function ItemWrapper(props: { children: JSX.Element; data: Item; router: NextRouter }): JSX.Element {
   const { children, data, router } = props;
 
   switch (data.type) {
     case "Assignment":
-      return <Link href={["/courses", router.query.course, "assignments", data.content_id].join("/")}>{children}</Link>;
+      return <Link href={["/courses", router.query.course, "assignments", data.content_id].join("/") + `?moduleItem=${data.id}`}>{children}</Link>;
     case "Discussion":
       return <Link href="/">{children}</Link>;
     case "ExternalTool":
@@ -129,9 +130,9 @@ function ItemWrapper(props: { children: JSX.Element; data: Item; router: NextRou
     case "ExternalUrl":
       return <a href={data.external_url} target="_blank">{children}</a>;
     case "File":
-      return <Link href="/">{children}</Link>;
+      return <Link href={["/courses", router.query.course, "files", data.content_id].join("/") + `?moduleItem=${data.id}`}>{children}</Link>;
     case "Page":
-      return <Link href={["/courses", router.query.course, "pages", data.page_url].join("/")}>{children}</Link>;
+      return <Link href={["/courses", router.query.course, "pages", data.page_url].join("/") + `?moduleItem=${data.id}`}>{children}</Link>;
     case "Quiz":
       return <Link href="/">{children}</Link>;
     case "SubHeader":
