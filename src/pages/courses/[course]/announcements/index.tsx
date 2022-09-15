@@ -33,7 +33,7 @@ function AnnouncementView(props: { data: Announcement[] }) {
   return (
     <main className="bg p-6 flex flex-col space-y-6">
       {data.map((item) => (
-        <Link href={["/courses", router.query.course, "announcements", item.id].join("/")}>{item.title}</Link>
+        <Link href={["/courses", router.query.course, "announcements", item.id].join("/")} key={item.id}>{item.title}</Link>
       ))}
     </main>
   );

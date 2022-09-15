@@ -35,9 +35,7 @@ function Sidebar() {
     queryClient.prefetchQuery(
       ["courses", router.query.course, "assignments"],
       async () =>
-        getData<Assignment[]>(
-          `courses/${router.query.course}/assignments`
-        )
+        getData<Assignment[]>(`courses/${router.query.course}/assignments`)
     );
 
     queryClient.prefetchQuery(
@@ -47,7 +45,7 @@ function Sidebar() {
           `courses/${router.query.course}/discussion_topics?only_announcements=true`
         )
     );
-  }, [])
+  }, [router.query.course]);
 
   return (
     <aside className="bg-zinc-100 dark:bg-zinc-700 w-72 basis-72">

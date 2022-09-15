@@ -128,7 +128,7 @@ export function ItemWrapper(props: { children: JSX.Element; data: Item; router: 
     case "ExternalTool":
       return <Link href="/">{children}</Link>;
     case "ExternalUrl":
-      return <a href={data.external_url} target="_blank">{children}</a>;
+      return <a href={data.external_url} rel="noreferrer" target="_blank">{children}</a>;
     case "File":
       return <Link href={["/courses", router.query.course, "files", data.content_id].join("/") + `?moduleItem=${data.id}`}>{children}</Link>;
     case "Page":

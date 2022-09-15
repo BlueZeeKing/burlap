@@ -37,6 +37,7 @@ function AssignmentView(props: { data: Assignment[] }) {
           href={["/courses", router.query.course, "assignments", item.id].join(
             "/"
           )}
+          key={item.id}
         >
           {item.name}
         </Link>
