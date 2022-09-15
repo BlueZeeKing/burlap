@@ -124,7 +124,7 @@ export function ItemWrapper(props: { children: JSX.Element; data: Item; router: 
     case "Assignment":
       return <Link href={["/courses", router.query.course, "assignments", data.content_id].join("/") + `?moduleItem=${data.id}`}>{children}</Link>;
     case "Discussion":
-      return <Link href="/">{children}</Link>;
+      return <Link href={["/courses", router.query.course, "discussion_topics", data.content_id].join("/") + `?moduleItem=${data.id}`}>{children}</Link>;
     case "ExternalTool":
       return <Link href="/">{children}</Link>;
     case "ExternalUrl":

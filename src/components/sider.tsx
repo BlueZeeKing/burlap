@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { getData } from "../lib/fetch";
 import { queryClient } from "../pages/_app";
 import { Tab, Module, Assignment, Announcement } from "../types/api";
@@ -22,6 +22,9 @@ function Sidebar() {
     ["courses", router.query.course, "tabs"],
     async () => await getData<Tab[]>(`courses/${router.query.course}/tabs`)
   );
+
+  const [isMouseDown, setMouseDown] = useState(false)
+  const [sidebarWidth, setSidebarWidth] = useState(200);
 
   useEffect(() => {
     queryClient.prefetchQuery(
@@ -47,8 +50,31 @@ function Sidebar() {
     );
   }, [router.query.course]);
 
+  useEffect(() => {
+    const mouseUpHandler = () => {
+      setMouseDown(false)
+    }
+
+    window.addEventListener("mouseup", mouseUpHandler)
+
+    return () => window.removeEventListener("mouseup", mouseUpHandler)
+  }, [])
+
+  useEffect(() => {
+    const mouseMoveHandler = (e) => {
+      pauseEvent(e);
+      if (isMouseDown) {
+        setSidebarWidth(e.clientX);
+      }
+    };
+
+    window.addEventListener("mousemove", mouseMoveHandler);
+
+    return () => window.removeEventListener("mousemove", mouseMoveHandler);
+  }, [isMouseDown]);
+
   return (
-    <aside className="bg-zinc-100 dark:bg-zinc-700 w-72 basis-72">
+    <aside className="bg-zinc-100 dark:bg-zinc-700 relative select-none" style={{width: sidebarWidth}}>
       {data
         ?.sort((item) => item.position)
         .map((item) => (
@@ -65,6 +91,7 @@ function Sidebar() {
             </Link>
           </p>
         ))}
+        <div className="h-full absolute right-0 w-3 cursor-col-resize bg-blue-500 top-0 translate-x-[50%]" onMouseDown={() => setMouseDown(true)}></div>
     </aside>
   );
 }
@@ -77,4 +104,12 @@ function getURL(data: Tab, courseId: string) {
   } else {
     return "/404"
   }
+}
+
+function pauseEvent(e) {
+  if (e.stopPropagation) e.stopPropagation();
+  if (e.preventDefault) e.preventDefault();
+  e.cancelBubble = true;
+  e.returnValue = false;
+  return false;
 }
