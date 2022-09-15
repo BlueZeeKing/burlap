@@ -103,7 +103,7 @@ function Sidebar() {
       ) : (
         <>
           <div
-            className="h-[600px] fixed w-10 top-[50%] left-0 -translate-y-[50%] z-50"
+            className="h-[600px] fixed w-14 top-[50%] left-0 -translate-y-[50%] z-50"
             onMouseEnter={previewView.onOpen}
           ></div>
           <div className="fixed bottom-0 left-0 p-3 z-50">
