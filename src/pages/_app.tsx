@@ -26,7 +26,7 @@ export default function MyApp({ Component, pageProps }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>
-        <ReactQueryDevtools />
+        <ReactQueryDevtools position="bottom-right" />
         <Component {...pageProps} />
       </ChakraProvider>
     </QueryClientProvider>

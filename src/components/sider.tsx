@@ -1,3 +1,6 @@
+import { Button, useDisclosure } from "@chakra-ui/react";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -10,7 +13,7 @@ export default function SidebarWrapper(props: {children: ReactNode}) {
   return (
     <div className="flex flex-grow">
       <Sidebar />
-      <div className="flex-grow bg">{props.children}</div>
+      <div className="flex-grow bg basis-0">{props.children}</div>
     </div>
   )
 }
@@ -24,7 +27,13 @@ function Sidebar() {
   );
 
   const [isMouseDown, setMouseDown] = useState(false)
-  const [sidebarWidth, setSidebarWidth] = useState(200);
+  const {isOpen, onOpen, onClose} = useDisclosure({defaultIsOpen: typeof window !== 'undefined' && window.localStorage.getItem("sidebar-open") != null ? window.localStorage.getItem("sidebar-open") == "true" : true})
+  const [sidebarWidth, setSidebarWidth] = useState(typeof window !== 'undefined' && window.localStorage.getItem("sidebar-width") != null ? parseInt(window.localStorage.getItem("sidebar-width")) : 200);
+
+  useEffect(() => {
+    window.localStorage.setItem("sidebar-width", sidebarWidth.toString())
+    window.localStorage.setItem("sidebar-width", isOpen.toString());
+  }, [sidebarWidth, isOpen])
 
   useEffect(() => {
     queryClient.prefetchQuery(
@@ -64,7 +73,11 @@ function Sidebar() {
     const mouseMoveHandler = (e) => {
       pauseEvent(e);
       if (isMouseDown) {
-        setSidebarWidth(e.clientX);
+        if (e.clientX < 80) {
+          onClose()
+        } else {
+          setSidebarWidth(e.clientX);
+        }
       }
     };
 
@@ -73,26 +86,53 @@ function Sidebar() {
     return () => window.removeEventListener("mousemove", mouseMoveHandler);
   }, [isMouseDown]);
 
+  console.log(isOpen)
+
   return (
-    <aside className="bg-zinc-100 dark:bg-zinc-700 relative select-none" style={{width: sidebarWidth}}>
-      {data
-        ?.sort((item) => item.position)
-        .map((item) => (
-          <p
-            key={item.id}
-            className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] rounded-lg ${
-              router.asPath == getURL(item, router.query.course as string)
-                ? "bg-sky-400 !bg-opacity-30"
-                : ""
-            }`}
+    <>
+      {isOpen ? (
+        <aside
+          className="bg-zinc-100 dark:bg-zinc-700 relative select-none"
+          style={{ width: sidebarWidth, flexBasis: sidebarWidth }}
+        >
+          {data
+            ?.sort((item) => item.position)
+            .map((item) => (
+              <Link href={getURL(item, router.query.course as string)}>
+                <p
+                  key={item.id}
+                  className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg ${
+                    router.asPath == getURL(item, router.query.course as string)
+                      ? "bg-sky-400 !bg-opacity-30"
+                      : ""
+                  }`}
+                >
+                  {item.label}
+                </p>
+              </Link>
+            ))}
+          <div
+            className="h-full absolute right-0 w-4 cursor-col-resize top-0 translate-x-[50%] px-[0.37rem]"
+            onMouseDown={() => setMouseDown(true)}
           >
-            <Link href={getURL(item, router.query.course as string)}>
-              {item.label}
-            </Link>
-          </p>
-        ))}
-        <div className="h-full absolute right-0 w-3 cursor-col-resize bg-blue-500 top-0 translate-x-[50%]" onMouseDown={() => setMouseDown(true)}></div>
-    </aside>
+            <div
+              className={`${
+                isMouseDown ? "bg-opacity-100" : "bg-opacity-0"
+              } bg-sky-500 w-full h-full transition duration-200`}
+            ></div>
+          </div>
+        </aside>
+      ) : (
+        <div className="fixed bottom-0 left-0 p-3">
+          <Button onClick={() => {
+            setSidebarWidth(200)
+            onOpen()
+          }}>
+            <FontAwesomeIcon icon={faChevronRight} />
+          </Button>
+        </div>
+      )}
+    </>
   );
 }
 
