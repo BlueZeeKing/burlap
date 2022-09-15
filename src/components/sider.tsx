@@ -3,7 +3,7 @@ import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { NextRouter, useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { getData } from "../lib/fetch";
 import { queryClient } from "../pages/_app";
@@ -29,10 +29,11 @@ function Sidebar() {
   const [isMouseDown, setMouseDown] = useState(false)
   const {isOpen, onOpen, onClose} = useDisclosure({defaultIsOpen: typeof window !== 'undefined' && window.localStorage.getItem("sidebar-open") != null ? window.localStorage.getItem("sidebar-open") == "true" : true})
   const [sidebarWidth, setSidebarWidth] = useState(typeof window !== 'undefined' && window.localStorage.getItem("sidebar-width") != null ? parseInt(window.localStorage.getItem("sidebar-width")) : 200);
+  const previewView = useDisclosure()
 
   useEffect(() => {
     window.localStorage.setItem("sidebar-width", sidebarWidth.toString())
-    window.localStorage.setItem("sidebar-width", isOpen.toString());
+    window.localStorage.setItem("sidebar-open", isOpen.toString());
   }, [sidebarWidth, isOpen])
 
   useEffect(() => {
@@ -91,48 +92,89 @@ function Sidebar() {
   return (
     <>
       {isOpen ? (
-        <aside
-          className="bg-zinc-100 dark:bg-zinc-700 relative select-none"
-          style={{ width: sidebarWidth, flexBasis: sidebarWidth }}
-        >
-          {data
-            ?.sort((item) => item.position)
-            .map((item) => (
-              <Link href={getURL(item, router.query.course as string)}>
-                <p
-                  key={item.id}
-                  className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg ${
-                    router.asPath == getURL(item, router.query.course as string)
-                      ? "bg-sky-400 !bg-opacity-30"
-                      : ""
-                  }`}
-                >
-                  {item.label}
-                </p>
-              </Link>
-            ))}
-          <div
-            className="h-full absolute right-0 w-4 cursor-col-resize top-0 translate-x-[50%] px-[0.37rem]"
-            onMouseDown={() => setMouseDown(true)}
-          >
-            <div
-              className={`${
-                isMouseDown ? "bg-opacity-100" : "bg-opacity-0"
-              } bg-sky-500 w-full h-full transition duration-200`}
-            ></div>
-          </div>
-        </aside>
+        <SiderInterior
+          data={data}
+          sidebarWidth={sidebarWidth}
+          router={router}
+          isMouseDown={isMouseDown}
+          setMouseDown={setMouseDown}
+          isResizable={true}
+        />
       ) : (
-        <div className="fixed bottom-0 left-0 p-3">
-          <Button onClick={() => {
-            setSidebarWidth(200)
-            onOpen()
-          }}>
-            <FontAwesomeIcon icon={faChevronRight} />
-          </Button>
-        </div>
+        <>
+          <div
+            className="h-[600px] fixed w-10 top-[50%] left-0 -translate-y-[50%] z-50"
+            onMouseEnter={previewView.onOpen}
+          ></div>
+          <div className="fixed bottom-0 left-0 p-3 z-50">
+            <Button
+              onClick={() => {
+                setSidebarWidth(200);
+                onOpen();
+              }}
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </Button>
+          </div>
+          {previewView.isOpen ? (
+            <div className="fixed top-[50%] left-0 -translate-y-[50%] h-[600px] z-50">
+              <SiderInterior
+                data={data}
+                sidebarWidth={250}
+                router={router}
+                isMouseDown={isMouseDown}
+                setMouseDown={setMouseDown}
+                isResizable={false}
+                onExit={previewView.onClose}
+                className="overflow-y-scroll h-[600px] rounded-r shadow"
+              />
+            </div>
+          ) : (
+            ""
+          )}
+        </>
       )}
     </>
+  );
+}
+
+function SiderInterior(props: { sidebarWidth: number; router: NextRouter; isMouseDown: boolean; setMouseDown: (a: boolean) => void; data: Tab[]; isResizable: boolean; className?: string; onExit?: () => void }) {
+  const {sidebarWidth, router, isMouseDown, setMouseDown, data, isResizable, className, onExit} = props
+
+  return (
+    <aside
+      className={"bg-zinc-100 dark:bg-zinc-700 relative select-none " + (className ? className : "")}
+      style={{ width: sidebarWidth, flexBasis: sidebarWidth }}
+      onMouseLeave={onExit}
+    >
+      {data
+        ?.sort((item) => item.position)
+        .map((item) => (
+          <Link href={getURL(item, router.query.course as string)}>
+            <p
+              key={item.id}
+              className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg whitespace-nowrap overflow-x-clip ${
+                router.asPath == getURL(item, router.query.course as string)
+                  ? "bg-sky-400 !bg-opacity-30"
+                  : ""
+              }`}
+            >
+              {item.label}
+            </p>
+          </Link>
+        ))}
+      { isResizable ? (
+      <div
+        className="h-full absolute right-0 w-4 cursor-col-resize top-0 translate-x-[50%] px-[0.37rem]"
+        onMouseDown={() => setMouseDown(true)}
+      >
+        <div
+          className={`${
+            isMouseDown ? "bg-opacity-100" : "bg-opacity-0"
+          } bg-sky-500 w-full h-full transition duration-200`}
+        ></div>
+      </div> ) : "" }
+    </aside>
   );
 }
 
