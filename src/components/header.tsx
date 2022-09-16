@@ -1,14 +1,13 @@
 import { Avatar, Badge, Img } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import Image from "next/image";
 import { getData } from "../lib/fetch";
 import { User, Unread } from "../types/api";
 
 
 export default function Header(props: {text?: string}) {
   const { data, isSuccess } = useQuery(["profile"], async () => await getData<User>("users/self/profile"));
-  const unread = useQuery(["unread"], async () => await getData<Unread>("conversations/unread_count"));
+  const unread = useQuery(["unread"], async () => await getData<Unread>("conversations/unread_count"), {staleTime: 500});
 
   return (
     <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex col-span-2">

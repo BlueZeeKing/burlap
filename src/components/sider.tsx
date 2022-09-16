@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { NextRouter, useRouter } from "next/router";
-import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { getData } from "../lib/fetch";
 import { queryClient } from "../pages/_app";
 import { Tab, Module, Assignment, Announcement } from "../types/api";
@@ -152,7 +152,7 @@ function SiderInterior(props: { sidebarWidth: number; router: NextRouter; isMous
 
   return (
     <aside
-      className={"bg-zinc-100 dark:bg-zinc-700 relative select-none " + (className ? className : "")}
+      className={"bg-zinc-100 dark:bg-zinc-700 relative select-none overflow-x-hidden " + (className ? className : "")}
       style={{ width: sidebarWidth, flexBasis: sidebarWidth }}
       onMouseLeave={onExit}
     >
@@ -161,7 +161,7 @@ function SiderInterior(props: { sidebarWidth: number; router: NextRouter; isMous
         .map((item) => (
           <Link href={getURL(item, router.query.course as string)} key={item.id}>
             <p
-              className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg whitespace-nowrap overflow-x-clip ${
+              className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg whitespace-nowrap overflow-x-hidden ${
                 router.asPath == getURL(item, router.query.course as string)
                   ? "bg-sky-400 !bg-opacity-30"
                   : ""

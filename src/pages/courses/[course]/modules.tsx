@@ -1,4 +1,4 @@
-import { Text, useDisclosure, Heading } from "@chakra-ui/react";
+import { Text, useDisclosure, Heading, Badge } from "@chakra-ui/react";
 import {
   faChevronDown,
   faChevronUp,
@@ -14,14 +14,15 @@ import Link from "next/link";
 import Header from "../../../components/header";
 import Loader from "../../../components/loader";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { NextRouter, useRouter } from "next/router";
 
 import { getData } from "../../../lib/fetch";
 import { CourseLayout } from "../../../components/layout";
 
-import { Module, Item, Type } from "../../../types/api";
+import { Module, Item, Type, Assignment } from "../../../types/api";
 import { queryClient } from "../../_app";
+import { useEffect } from "react";
 
 export default function Modules() {
   const router = useRouter()
@@ -29,6 +30,30 @@ export default function Modules() {
   const { isSuccess, data } = useQuery(
     ["courses", router.query.course, "modules"],
     async () => getData<Module[]>(`courses/${router.query.course}/modules?include=items`),
+    { onSuccess: (data) => {
+      data.flatMap((item) => item.items).forEach((item) => {
+        if (item.type == "Assignment") {
+          queryClient.prefetchQuery(
+            ["courses", router.query.course, "assignments", item.content_id.toString()],
+            async () =>
+              getData<Assignment>(
+                `courses/${router.query.course}/assignments/${item.content_id}`
+              )
+          );
+        }
+      })
+    }}
+  );
+
+  const assignments = useQuery(
+    ["courses", router.query.course, "assignments"],
+    async () =>
+      getData<Assignment[]>(`courses/${router.query.course}/assignments`),
+    {onSuccess: (data) => {
+      data.forEach((assignment) => {
+        queryClient.setQueryData(["courses", router.query.course, "assignments", assignment.id.toString()], assignment)
+      })
+    }}
   );
 
   return (
@@ -43,7 +68,7 @@ function ModulesView(props: {data: Module[]}) {
 
   return (
     <main className="bg p-6 flex flex-col space-y-6">
-      {props.data.map((item) => <Module router={router} key={item.id} module={item} />)}
+      {props.data.map((item) => <Module router={router} key={item.id} module={item}  />)}
     </main>
   );
 }
@@ -78,22 +103,7 @@ function Module(props: {module: Module; router: NextRouter}) {
                 {item.title}
               </Heading>
             ) : (
-              <ItemWrapper data={item} router={props.router} key={item.id}>
-                <Text
-                  cursor="pointer"
-                  className="hover:underline"
-                  p="4"
-                  pl={4 + item.indent * 4}
-                >
-                  {
-                    <FontAwesomeIcon
-                      icon={getIcon(item.type)}
-                      className="pr-4 pl-2"
-                    />
-                  }
-                  {item.title}
-                </Text>
-              </ItemWrapper>
+              <ItemView item={item} router={props.router} key={item.id} />
             )
           )}
         </div>
@@ -101,6 +111,46 @@ function Module(props: {module: Module; router: NextRouter}) {
         ""
       )}
     </div>
+  );
+}
+
+function ItemView(props: {item: Item; router: NextRouter}) {
+  const { item, router } = props
+  const { data, isSuccess } = useQuery(
+    ["courses", router.query.course, "assignments", item.content_id?.toString()],
+    async () =>
+      getData<Assignment>(
+        `courses/${router.query.course}/assignments/${item.content_id}`
+      ),
+    { enabled: item.type == "Assignment" }
+  );
+
+  return (
+    <ItemWrapper data={item} router={router}>
+      <div className="flex">
+        <Text
+          cursor="pointer"
+          className="hover:underline"
+          p="4"
+          pl={4 + item.indent * 4}
+        >
+          {<FontAwesomeIcon icon={getIcon(item.type)} className="pr-4 pl-2" />}
+          {item.title}
+        </Text>
+        <div className="flex-grow" />
+        {isSuccess ? (
+          <div className="grid content-center px-4">
+            {data.has_submitted_submissions ? (
+              <Badge colorScheme="green">Submitted</Badge>
+            ) : (
+              <Badge colorScheme="red">Not Submitted</Badge>
+            )}
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
+    </ItemWrapper>
   );
 }
 

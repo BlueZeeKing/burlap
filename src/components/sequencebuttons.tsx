@@ -83,11 +83,9 @@ export function prefetchData(data: Item, router: NextRouter) {
       break;
     case "Page":
       queryClient.prefetchQuery(
-        ["courses", router.query.course, "pages", data.content_id.toString()],
+        ["courses", router.query.course, "pages", data.page_url.toString()],
         async () =>
-          getData<Page>(
-            `courses/${router.query.course}/pages/${data.content_id}`
-          )
+          getData<Page>(`courses/${router.query.course}/pages/${data.page_url}`)
       );
       break;
   }
