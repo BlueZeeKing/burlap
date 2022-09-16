@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { NextRouter, useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import { getData } from "../lib/fetch";
 import { queryClient } from "../pages/_app";
 import { Tab, Module, Assignment, Announcement } from "../types/api";
@@ -27,14 +27,9 @@ function Sidebar() {
   );
 
   const [isMouseDown, setMouseDown] = useState(false)
-  const {isOpen, onOpen, onClose} = useDisclosure({defaultIsOpen: typeof window !== 'undefined' && window.localStorage.getItem("sidebar-open") != null ? window.localStorage.getItem("sidebar-open") == "true" : true})
-  const [sidebarWidth, setSidebarWidth] = useState(typeof window !== 'undefined' && window.localStorage.getItem("sidebar-width") != null ? parseInt(window.localStorage.getItem("sidebar-width")) : 200);
+  const {isOpen, onOpen, onClose} = useDisclosure()
+  const [sidebarWidth, setSidebarWidth] = useState(200);
   const previewView = useDisclosure()
-
-  useEffect(() => {
-    window.localStorage.setItem("sidebar-width", sidebarWidth.toString())
-    window.localStorage.setItem("sidebar-open", isOpen.toString());
-  }, [sidebarWidth, isOpen])
 
   useEffect(() => {
     queryClient.prefetchQuery(
@@ -85,9 +80,23 @@ function Sidebar() {
     window.addEventListener("mousemove", mouseMoveHandler);
 
     return () => window.removeEventListener("mousemove", mouseMoveHandler);
-  }, [isMouseDown]);
+  }, [isMouseDown, onClose]);
 
-  console.log(isOpen)
+  useEffect(() => {
+    if (window.localStorage.getItem("sidebar-width") != null)
+      setSidebarWidth(parseInt(window.localStorage.getItem("sidebar-width")));
+
+    if (
+      window.localStorage.getItem("sidebar-open") != null &&
+      window.localStorage.getItem("sidebar-open") == "true"
+    )
+      onOpen();
+  }, [onOpen]);
+
+  useEffect(() => {
+    window.localStorage.setItem("sidebar-width", sidebarWidth.toString());
+    window.localStorage.setItem("sidebar-open", isOpen.toString());
+  }, [sidebarWidth, isOpen]);
 
   return (
     <>
@@ -150,9 +159,8 @@ function SiderInterior(props: { sidebarWidth: number; router: NextRouter; isMous
       {data
         ?.sort((item) => item.position)
         .map((item) => (
-          <Link href={getURL(item, router.query.course as string)}>
+          <Link href={getURL(item, router.query.course as string)} key={item.id}>
             <p
-              key={item.id}
               className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg whitespace-nowrap overflow-x-clip ${
                 router.asPath == getURL(item, router.query.course as string)
                   ? "bg-sky-400 !bg-opacity-30"
