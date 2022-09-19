@@ -29,32 +29,10 @@ export default function Modules() {
 
   const { isSuccess, data } = useQuery(
     ["courses", router.query.course, "modules"],
-    async () => getData<Module[]>(`courses/${router.query.course}/modules?include=items`),
-    { onSuccess: (data) => {
-      data.flatMap((item) => item.items).forEach((item) => {
-        if (item.type == "Assignment") {
-          queryClient.prefetchQuery(
-            ["courses", router.query.course, "assignments", item.content_id.toString()],
-            async () =>
-              getData<Assignment>(
-                `courses/${router.query.course}/assignments/${item.content_id}`
-              )
-          );
-        }
-      })
-    }}
+    async () => getData<Module[]>(`courses/${router.query.course}/modules`),
   );
 
-  const assignments = useQuery(
-    ["courses", router.query.course, "assignments"],
-    async () =>
-      getData<Assignment[]>(`courses/${router.query.course}/assignments`),
-    {onSuccess: (data) => {
-      data.forEach((assignment) => {
-        queryClient.setQueryData(["courses", router.query.course, "assignments", assignment.id.toString()], assignment)
-      })
-    }}
-  );
+  console.log(data)
 
   return (
     <CourseLayout isSuccess={isSuccess}>
@@ -75,6 +53,12 @@ function ModulesView(props: {data: Module[]}) {
 
 function Module(props: {module: Module; router: NextRouter}) {
   const { isOpen, onToggle } = useDisclosure()
+  const { isSuccess, data } = useQuery(
+    ["courses", props.router.query.course, "modules", props.module.id.toString(), "items"],
+    async () => getData<Item[]>(`courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details`)
+  );
+
+  console.log(data)
 
   return (
     <div>
@@ -90,7 +74,7 @@ function Module(props: {module: Module; router: NextRouter}) {
       </div>
       {isOpen ? (
         <div className="bg-zinc-100 dark:bg-[#222224] -translate-y-1 z-10 relative pt-1 rounded-b mx-1">
-          {props.module.items.map((item) =>
+          {data?.map((item) =>
             item.type == "SubHeader" ? (
               <Heading
                 cursor="pointer"
@@ -116,15 +100,6 @@ function Module(props: {module: Module; router: NextRouter}) {
 
 function ItemView(props: {item: Item; router: NextRouter}) {
   const { item, router } = props
-  const { data, isSuccess } = useQuery(
-    ["courses", router.query.course, "assignments", item.content_id?.toString()],
-    async () =>
-      getData<Assignment>(
-        `courses/${router.query.course}/assignments/${item.content_id}`
-      ),
-    { enabled: item.type == "Assignment" }
-  );
-
   return (
     <ItemWrapper data={item} router={router}>
       <div className="flex">
@@ -137,18 +112,6 @@ function ItemView(props: {item: Item; router: NextRouter}) {
           {<FontAwesomeIcon icon={getIcon(item.type)} className="pr-4 pl-2" />}
           {item.title}
         </Text>
-        <div className="flex-grow" />
-        {isSuccess ? (
-          <div className="grid content-center px-4">
-            {data.has_submitted_submissions ? (
-              <Badge colorScheme="green">Submitted</Badge>
-            ) : (
-              <Badge colorScheme="red">Not Submitted</Badge>
-            )}
-          </div>
-        ) : (
-          ""
-        )}
       </div>
     </ItemWrapper>
   );

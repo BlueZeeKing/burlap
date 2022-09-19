@@ -60,7 +60,7 @@ export interface Item {
   type: Type;
   external_url: string;
   page_url: string;
-  completion_requirement: {completed: boolean};
+  content_details: { completed: boolean };
 }
 
 export interface Announcement {
