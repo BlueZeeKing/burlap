@@ -1,4 +1,4 @@
-import { Text, useDisclosure, Heading, Badge } from "@chakra-ui/react";
+import { Text, useDisclosure, Heading, Badge, Box } from "@chakra-ui/react";
 import {
   faChevronDown,
   faChevronUp,
@@ -8,11 +8,10 @@ import {
   faNewspaper,
   faComment,
   faSquareCheck,
+  faLock,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import Header from "../../../components/header";
-import Loader from "../../../components/loader";
 
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { NextRouter, useRouter } from "next/router";
@@ -20,9 +19,8 @@ import { NextRouter, useRouter } from "next/router";
 import { getData } from "../../../lib/fetch";
 import { CourseLayout } from "../../../components/layout";
 
-import { Module, Item, Type, Assignment } from "../../../types/api";
-import { queryClient } from "../../_app";
-import { useEffect } from "react";
+import { Module, Item, Type } from "../../../types/api";
+import { parseDate } from "../../../lib/date";
 
 export default function Modules() {
   const router = useRouter()
@@ -55,7 +53,7 @@ function Module(props: {module: Module; router: NextRouter}) {
   const { isOpen, onToggle } = useDisclosure()
   const { isSuccess, data } = useQuery(
     ["courses", props.router.query.course, "modules", props.module.id.toString(), "items"],
-    async () => getData<Item[]>(`courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details`)
+    async () => getData<Item[]>(`courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details&per_page=50`)
   );
 
   console.log(data)
@@ -103,15 +101,28 @@ function ItemView(props: {item: Item; router: NextRouter}) {
   return (
     <ItemWrapper data={item} router={router}>
       <div className="flex">
-        <Text
-          cursor="pointer"
-          className="hover:underline"
-          p="4"
-          pl={4 + item.indent * 4}
-        >
-          {<FontAwesomeIcon icon={getIcon(item.type)} className="pr-4 pl-2" />}
-          {item.title}
-        </Text>
+        <Box cursor="pointer" p="4" pl={4 + item.indent * 4} display="flex">
+          <div className="grid content-center">
+            <FontAwesomeIcon icon={getIcon(item.type)} className="pr-4 pl-2" />
+          </div>
+          <div>
+            <span className="hover:underline">{item.title}</span>
+            {item.content_details.due_at ? (
+              <p className="text-zinc-400 text-xs">
+                {parseDate(item.content_details.due_at)}
+              </p>
+            ) : (
+              ""
+            )}
+          </div>
+          {item.content_details.locked ? (
+            <div className="grid content-center">
+              <FontAwesomeIcon icon={faLock} className="px-2 text-zinc-400" size="xs" />
+            </div>
+          ) : (
+            ""
+          )}
+        </Box>
       </div>
     </ItemWrapper>
   );

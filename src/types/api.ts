@@ -60,7 +60,7 @@ export interface Item {
   type: Type;
   external_url: string;
   page_url: string;
-  content_details: { completed: boolean };
+  content_details: { completed: boolean; due_at: string; locked: boolean };
 }
 
 export interface Announcement {
