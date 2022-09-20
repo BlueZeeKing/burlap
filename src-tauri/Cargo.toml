@@ -1,9 +1,9 @@
 [package]
 name = "burlap"
-version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
+version = "0.0.2"
+description = "A third party Canvas by Instructure desktop app"
+authors = ["BlueZeeKing"]
+license = "MIT"
 repository = ""
 edition = "2021"
 rust-version = "1.57"
