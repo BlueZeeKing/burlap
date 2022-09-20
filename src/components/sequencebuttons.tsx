@@ -6,6 +6,7 @@ import { getData } from "../lib/fetch";
 import { ItemWrapper } from "../pages/courses/[course]/modules";
 import { queryClient } from "../pages/_app";
 import { Assignment, Item, Page, File } from "../types/api";
+import PrefetchWrapper from "./prefetcher";
 
 interface Sequence {
   items: {
@@ -20,16 +21,6 @@ export default function SequenceButtons() {
   const { data, isSuccess } = useQuery(
     ["courses", router.query.course, "moduleitem", router.query.moduleItem],
     async () => await getData<Sequence>(`courses/${router.query.course}/module_item_sequence?asset_type=ModuleItem&asset_id=${router.query.moduleItem}`),
-    { onSuccess: (data) => {
-      if (data.items.length > 0) {
-        if (data.items[0].next != null) {
-          prefetchData(data.items[0].next, router);
-        }
-        if (data.items[0].prev != null) {
-          prefetchData(data.items[0].prev, router);
-        }
-      }
-    }}
   );
 
   if (isSuccess && data.items.length > 0) {
@@ -38,17 +29,21 @@ export default function SequenceButtons() {
         <hr className="mx-10" />
         <div className="flex p-6">
           {data.items[0].prev != null ? (
+            <PrefetchWrapper prefetch={() => prefetchData(data.items[0].prev, router)}>
             <ItemWrapper data={data.items[0].prev} router={router}>
               <Button>Previous</Button>
             </ItemWrapper>
+            </PrefetchWrapper>
           ) : (
             ""
           )}
           <div className="flex-grow" />
           {data.items[0].next != null ? (
-            <ItemWrapper data={data.items[0].next} router={router}>
-              <Button>Next</Button>
-            </ItemWrapper>
+            <PrefetchWrapper prefetch={() => prefetchData(data.items[0].next, router)}>
+              <ItemWrapper data={data.items[0].next} router={router}>
+                <Button>Next</Button>
+              </ItemWrapper>
+            </PrefetchWrapper>
           ) : (
             ""
           )}
@@ -61,7 +56,6 @@ export default function SequenceButtons() {
 }
 
 export function prefetchData(data: Item, router: NextRouter) {
-  console.log(data)
   switch (data.type) {
     case "Assignment":
       queryClient.prefetchQuery(

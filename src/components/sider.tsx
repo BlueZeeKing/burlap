@@ -6,8 +6,10 @@ import Link from "next/link";
 import { NextRouter, useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { getData } from "../lib/fetch";
+import { prefectDefaultView } from "../pages";
 import { queryClient } from "../pages/_app";
-import { Tab, Module, Assignment, Announcement } from "../types/api";
+import { Tab, Module, Assignment, Announcement, Course, Discussion } from "../types/api";
+import PrefetchWrapper from "./prefetcher";
 
 export default function SidebarWrapper(props: {children: ReactNode}) {
   return (
@@ -26,34 +28,12 @@ function Sidebar() {
     async () => await getData<Tab[]>(`courses/${router.query.course}/tabs`)
   );
 
+  console.log(data)
+
   const [isMouseDown, setMouseDown] = useState(false)
   const {isOpen, onOpen, onClose} = useDisclosure()
   const [sidebarWidth, setSidebarWidth] = useState(200);
   const previewView = useDisclosure()
-
-  useEffect(() => {
-    queryClient.prefetchQuery(
-      ["courses", router.query.course, "modules"],
-      async () =>
-        getData<Module[]>(
-          `courses/${router.query.course}/modules?include=items`
-        )
-    );
-
-    queryClient.prefetchQuery(
-      ["courses", router.query.course, "assignments"],
-      async () =>
-        getData<Assignment[]>(`courses/${router.query.course}/assignments`)
-    );
-
-    queryClient.prefetchQuery(
-      ["courses", router.query.course, "announcements"],
-      async () =>
-        getData<Announcement[]>(
-          `courses/${router.query.course}/discussion_topics?only_announcements=true`
-        )
-    );
-  }, [router.query.course]);
 
   useEffect(() => {
     const mouseUpHandler = () => {
@@ -159,17 +139,19 @@ function SiderInterior(props: { sidebarWidth: number; router: NextRouter; isMous
       {data
         ?.sort((item) => item.position)
         .map((item) => (
-          <Link href={getURL(item, router.query.course as string)} key={item.id}>
-            <p
-              className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg whitespace-nowrap overflow-x-hidden ${
-                router.asPath == getURL(item, router.query.course as string)
-                  ? "bg-sky-400 !bg-opacity-30"
-                  : ""
-              }`}
-            >
-              {item.label}
-            </p>
-          </Link>
+          <PrefetchWrapper prefetch={() => getPrefetch(router, item)} key={item.id}>
+            <Link href={getURL(item, router.query.course as string)}>
+              <p
+                className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg whitespace-nowrap overflow-x-hidden ${
+                  router.asPath == getURL(item, router.query.course as string)
+                    ? "bg-sky-400 !bg-opacity-30"
+                    : ""
+                }`}
+              >
+                {item.label}
+              </p>
+            </Link>
+          </PrefetchWrapper>
         ))}
       { isResizable ? (
       <div
@@ -203,3 +185,16 @@ function pauseEvent(e) {
   e.returnValue = false;
   return false;
 }
+
+const getPrefetch = (router: NextRouter, tab: Tab) => {
+  switch (tab.id) {
+    case "modules":
+      queryClient.prefetchQuery(["courses", router.query.course, "modules"], async () => getData<Module[]>(`courses/${router.query.course}/modules?include=items`)); break;
+    case "announcements":
+      queryClient.prefetchQuery(["courses", router.query.course, "announcements"], async () => getData<Announcement[]>(`courses/${router.query.course}/discussion_topics?only_announcements=true`)); break;
+    case "assignments":
+      queryClient.prefetchQuery(["courses", router.query.course, "assignments"], async () => getData<Assignment[]>(`courses/${router.query.course}/assignments`)); break;
+    case "discussion_topics":
+      queryClient.prefetchQuery(["courses", router.query.course, "discussions"], async () => getData<Discussion[]>(`courses/${router.query.course}/discussion_topics`)); break;
+  }
+};

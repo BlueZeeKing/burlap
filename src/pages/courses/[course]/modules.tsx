@@ -19,8 +19,10 @@ import { NextRouter, useRouter } from "next/router";
 import { getData } from "../../../lib/fetch";
 import { CourseLayout } from "../../../components/layout";
 
-import { Module, Item, Type } from "../../../types/api";
+import { Module, Item, Type, Assignment, Discussion, Page } from "../../../types/api";
 import { parseDate } from "../../../lib/date";
+import PrefetchWrapper from "../../../components/prefetcher";
+import { queryClient } from "../../_app";
 
 export default function Modules() {
   const router = useRouter()
@@ -99,32 +101,34 @@ function Module(props: {module: Module; router: NextRouter}) {
 function ItemView(props: {item: Item; router: NextRouter}) {
   const { item, router } = props
   return (
-    <ItemWrapper data={item} router={router}>
-      <div className="flex">
-        <Box cursor="pointer" p="4" pl={4 + item.indent * 4} display="flex">
-          <div className="grid content-center">
-            <FontAwesomeIcon icon={getIcon(item.type)} className="pr-4 pl-2" />
-          </div>
-          <div>
-            <span className="hover:underline">{item.title}</span>
-            {item.content_details.due_at ? (
-              <p className="text-zinc-400 text-xs">
-                {parseDate(item.content_details.due_at)}
-              </p>
+    <PrefetchWrapper prefetch={() => prefetch(item, router.query.course as string)}>
+      <ItemWrapper data={item} router={router}>
+        <div className="flex">
+          <Box cursor="pointer" p="4" pl={4 + item.indent * 4} display="flex">
+            <div className="grid content-center">
+              <FontAwesomeIcon icon={getIcon(item.type)} className="pr-4 pl-2" />
+            </div>
+            <div>
+              <span className="hover:underline">{item.title}</span>
+              {item.content_details.due_at ? (
+                <p className="text-zinc-400 text-xs">
+                  {parseDate(item.content_details.due_at)}
+                </p>
+              ) : (
+                ""
+              )}
+            </div>
+            {item.content_details.locked ? (
+              <div className="grid content-center">
+                <FontAwesomeIcon icon={faLock} className="px-2 text-zinc-400" size="xs" />
+              </div>
             ) : (
               ""
             )}
-          </div>
-          {item.content_details.locked ? (
-            <div className="grid content-center">
-              <FontAwesomeIcon icon={faLock} className="px-2 text-zinc-400" size="xs" />
-            </div>
-          ) : (
-            ""
-          )}
-        </Box>
-      </div>
-    </ItemWrapper>
+          </Box>
+        </div>
+      </ItemWrapper>
+    </PrefetchWrapper>
   );
 }
 
@@ -138,6 +142,39 @@ function getIcon(type: Type) {
     case "Page": return faNewspaper;
     case "Quiz": return faSquareCheck;
     case "SubHeader": return undefined;
+  }
+}
+
+function prefetch(item: Item, courseID: string) {
+  switch (item.type) {
+    case "Assignment":
+      return queryClient.prefetchQuery(
+        ["courses", courseID, "assignments", item.content_id.toString()],
+        async () =>
+          getData<Assignment>(
+            `courses/${courseID}/assignments/${item.content_id}`
+          )
+      );
+    case "Discussion":
+      return queryClient.prefetchQuery(
+        ["courses", courseID, "discussions", item.content_id.toString()],
+        async () =>
+          getData<Discussion>(
+            `courses/${courseID}/discussion_topics/${item.content_id}`
+          )
+      );
+    case "File":
+      return queryClient.prefetchQuery(
+        ["courses", courseID, "file", item.content_id.toString()],
+        async () =>
+          await getData<File>(`courses/${courseID}/files/${item.content_id}`)
+      );
+    case "Page":
+      return queryClient.prefetchQuery(
+        ["courses", courseID, "pages", item.page_url],
+        async () =>
+          getData<Page>(`courses/${courseID}/pages/${item.content_id}`)
+      );
   }
 }
 
