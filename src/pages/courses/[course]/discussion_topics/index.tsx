@@ -3,9 +3,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { CourseLayout } from "../../../../components/layout";
 import { getData } from "../../../../lib/fetch";
-import { Assignment, Discussion } from "../../../../types/api";
+import { Discussion } from "../../../../types/api";
 
-export default function AssignmentList() {
+export default function DiscussionList() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
@@ -16,12 +16,12 @@ export default function AssignmentList() {
 
   return (
     <CourseLayout isSuccess={isSuccess}>
-      <AssignmentView data={data} />
+      <DiscussionView data={data} />
     </CourseLayout>
   );
 }
 
-function AssignmentView(props: { data: Discussion[] }) {
+function DiscussionView(props: { data: Discussion[] }) {
   const { data } = props;
 
   const router = useRouter();

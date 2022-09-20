@@ -1,6 +1,5 @@
 import { Button } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { NextRouter, useRouter } from "next/router";
 import { getData } from "../lib/fetch";
 import { ItemWrapper } from "../pages/courses/[course]/modules";

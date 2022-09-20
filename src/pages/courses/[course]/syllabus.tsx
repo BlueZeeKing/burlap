@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import Header from "../../../components/header";
 import { CourseLayout } from "../../../components/layout";
-import Loader from "../../../components/loader";
 import Sanitizer from "../../../components/sanitize";
 import { getData } from "../../../lib/fetch";
 import { Course } from "../../../types/api";

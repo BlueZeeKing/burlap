@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { saveKey } from "../lib/auth";
 
-export default function App() {
+export default function Start() {
   const [key, setKey] = useState("")
   const nav = useRouter()
 

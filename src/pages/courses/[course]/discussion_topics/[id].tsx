@@ -2,14 +2,12 @@ import { Avatar } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { NextRouter, useRouter } from "next/router";
 import { useEffect, useRef } from "react";
-import Header from "../../../../components/header";
 import { CourseLayout } from "../../../../components/layout";
-import Loader from "../../../../components/loader";
 import Sanitizer, { clean } from "../../../../components/sanitize";
 import SequenceButtons from "../../../../components/sequencebuttons";
 import { parseDate } from "../../../../lib/date";
 import { getData } from "../../../../lib/fetch";
-import { Assignment, Discussion } from "../../../../types/api";
+import { Discussion } from "../../../../types/api";
 
 interface DiscussionView {
   unread_entries: number[];
@@ -31,7 +29,7 @@ interface DiscussionEntry {
   created_at: string;
 }
 
-export default function AssignmentPage() {
+export default function DiscussionPage() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
@@ -52,12 +50,12 @@ export default function AssignmentPage() {
 
   return (
     <CourseLayout isSuccess={isSuccess}>
-      <AssignmentView data={data} viewData={discussionView.data} viewDataReady={discussionView.isSuccess} />
+      <DiscussionView data={data} viewData={discussionView.data} viewDataReady={discussionView.isSuccess} />
     </CourseLayout>
   );
 }
 
-function AssignmentView(props: { data: Discussion; viewData: DiscussionView; viewDataReady: boolean }) {
+function DiscussionView(props: { data: Discussion; viewData: DiscussionView; viewDataReady: boolean }) {
   const { data, viewData, viewDataReady } = props;
 
   const router = useRouter()

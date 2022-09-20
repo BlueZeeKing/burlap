@@ -1,4 +1,4 @@
-import { Text, useDisclosure, Heading, Badge, Box } from "@chakra-ui/react";
+import { useDisclosure, Heading, Box } from "@chakra-ui/react";
 import {
   faChevronDown,
   faChevronUp,
@@ -13,7 +13,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { NextRouter, useRouter } from "next/router";
 
 import { getData } from "../../../lib/fetch";

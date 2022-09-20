@@ -6,9 +6,8 @@ import Link from "next/link";
 import { NextRouter, useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { getData } from "../lib/fetch";
-import { prefectDefaultView } from "../pages";
 import { queryClient } from "../pages/_app";
-import { Tab, Module, Assignment, Announcement, Course, Discussion } from "../types/api";
+import { Tab, Module, Assignment, Announcement, Discussion } from "../types/api";
 import PrefetchWrapper from "./prefetcher";
 
 export default function SidebarWrapper(props: {children: ReactNode}) {
