@@ -62,8 +62,6 @@ function AssignmentView(props: { data: Discussion; viewData: DiscussionView; vie
 
   const router = useRouter()
 
-  console.log(viewDataReady);
-
   return (
     <div>
       <Sanitizer

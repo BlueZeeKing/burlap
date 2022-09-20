@@ -29,8 +29,6 @@ export default function AssignmentPage() {
 function AssignmentView(props: { data: Assignment }) {
   const { data } = props
 
-  console.log(data)
-
   return (
     <div>
       <Sanitizer

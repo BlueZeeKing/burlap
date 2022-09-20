@@ -28,8 +28,6 @@ function Sidebar() {
     async () => await getData<Tab[]>(`courses/${router.query.course}/tabs`)
   );
 
-  console.log(data)
-
   const [isMouseDown, setMouseDown] = useState(false)
   const {isOpen, onOpen, onClose} = useDisclosure()
   const [sidebarWidth, setSidebarWidth] = useState(200);
@@ -52,7 +50,8 @@ function Sidebar() {
         if (e.clientX < 80) {
           onClose()
         } else {
-          setSidebarWidth(e.clientX);
+          setSidebarWidth(e.clientX)
+          window.localStorage.setItem("sidebar-width", e.clientX.toString());
         }
       }
     };
@@ -63,20 +62,19 @@ function Sidebar() {
   }, [isMouseDown, onClose]);
 
   useEffect(() => {
-    if (window.localStorage.getItem("sidebar-width") != null)
-      setSidebarWidth(parseInt(window.localStorage.getItem("sidebar-width")));
+    if (window.localStorage.getItem("sidebar-width") != null) {
+      let data = parseInt(window.localStorage.getItem("sidebar-width"));
+      setSidebarWidth(data);
+    }
 
-    if (
-      window.localStorage.getItem("sidebar-open") != null &&
-      window.localStorage.getItem("sidebar-open") == "true"
-    )
+    if (window.localStorage.getItem("sidebar-open") != null && window.localStorage.getItem("sidebar-open") == "true") {
       onOpen();
+    }
   }, [onOpen]);
 
   useEffect(() => {
-    window.localStorage.setItem("sidebar-width", sidebarWidth.toString());
     window.localStorage.setItem("sidebar-open", isOpen.toString());
-  }, [sidebarWidth, isOpen]);
+  }, [isOpen]);
 
   return (
     <>
@@ -98,7 +96,7 @@ function Sidebar() {
           <div className="fixed bottom-0 left-0 p-3 z-50">
             <Button
               onClick={() => {
-                setSidebarWidth(200);
+                //setSidebarWidth(200);
                 onOpen();
               }}
             >

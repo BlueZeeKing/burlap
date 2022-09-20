@@ -32,8 +32,6 @@ export default function Modules() {
     async () => getData<Module[]>(`courses/${router.query.course}/modules`),
   );
 
-  console.log(data)
-
   return (
     <CourseLayout isSuccess={isSuccess}>
       <ModulesView data={data} />
@@ -57,8 +55,6 @@ function Module(props: {module: Module; router: NextRouter}) {
     ["courses", props.router.query.course, "modules", props.module.id.toString(), "items"],
     async () => getData<Item[]>(`courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details&per_page=50`)
   );
-
-  console.log(data)
 
   return (
     <div>
