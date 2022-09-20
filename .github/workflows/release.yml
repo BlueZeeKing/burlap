@@ -23,11 +23,17 @@ jobs:
 
       - name: Setup PNPM
         uses: pnpm/action-setup@v2.2.2
+        with:
+          version: latest
 
       - name: Rust setup
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+          
+      - name: Install MacOS target
+        if: matrix.platform == 'macos-latest'
+        run: rustup target add aarch64-apple-darwin
 
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
@@ -38,7 +44,7 @@ jobs:
         run: pnpm i
 
       - name: Build the app
-        uses: tauri-apps/tauri-action@v0
+        uses: BlueZeeKing/tauri-action@v1.4 
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,3 +54,4 @@ jobs:
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
+          args: ${{ matrix.platform == 'macos-latest' && '--target universal-apple-darwin' || '' }}

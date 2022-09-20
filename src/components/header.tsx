@@ -1,18 +1,23 @@
 import { Avatar, Badge, Img } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import Image from "next/image";
 import { getData } from "../lib/fetch";
-import { User, Unread } from "../types/api";
+import { queryClient } from "../pages/_app";
+import { User, Unread, DashboardCourse } from "../types/api";
+import PrefetchWrapper from "./prefetcher";
 
 
 export default function Header(props: {text?: string}) {
   const { data, isSuccess } = useQuery(["profile"], async () => await getData<User>("users/self/profile"));
-  const unread = useQuery(["unread"], async () => await getData<Unread>("conversations/unread_count"));
+  const unread = useQuery(["unread"], async () => await getData<Unread>("conversations/unread_count"), {staleTime: 500});
 
   return (
     <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex col-span-2">
-      <Logo className="cursor-pointer p-4 pl-2" />
+      <div className="h-full p-4">
+        <PrefetchWrapper className="h-full aspect-square" prefetch={() => queryClient.prefetchQuery(["dashboard"], async () => await getData<DashboardCourse[]>("dashboard/dashboard_cards"))}>
+          <Logo className="cursor-pointer" />
+        </PrefetchWrapper>
+      </div>
       <h1 className="text-2xl grid content-center">{props.text}</h1>
       <div className="flex-grow"></div>
       <Link href="messages">

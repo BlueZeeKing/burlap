@@ -1,4 +1,4 @@
-import { Text, useDisclosure, Heading } from "@chakra-ui/react";
+import { useDisclosure, Heading, Box } from "@chakra-ui/react";
 import {
   faChevronDown,
   faChevronUp,
@@ -8,11 +8,10 @@ import {
   faNewspaper,
   faComment,
   faSquareCheck,
+  faLock,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import Header from "../../../components/header";
-import Loader from "../../../components/loader";
 
 import { useQuery } from "@tanstack/react-query";
 import { NextRouter, useRouter } from "next/router";
@@ -20,7 +19,9 @@ import { NextRouter, useRouter } from "next/router";
 import { getData } from "../../../lib/fetch";
 import { CourseLayout } from "../../../components/layout";
 
-import { Module, Item, Type } from "../../../types/api";
+import { Module, Item, Type, Assignment, Discussion, Page } from "../../../types/api";
+import { parseDate } from "../../../lib/date";
+import PrefetchWrapper from "../../../components/prefetcher";
 import { queryClient } from "../../_app";
 
 export default function Modules() {
@@ -28,7 +29,7 @@ export default function Modules() {
 
   const { isSuccess, data } = useQuery(
     ["courses", router.query.course, "modules"],
-    async () => getData<Module[]>(`courses/${router.query.course}/modules?include=items`),
+    async () => getData<Module[]>(`courses/${router.query.course}/modules`),
   );
 
   return (
@@ -43,13 +44,17 @@ function ModulesView(props: {data: Module[]}) {
 
   return (
     <main className="bg p-6 flex flex-col space-y-6">
-      {props.data.map((item) => <Module router={router} key={item.id} module={item} />)}
+      {props.data.map((item) => <Module router={router} key={item.id} module={item}  />)}
     </main>
   );
 }
 
 function Module(props: {module: Module; router: NextRouter}) {
   const { isOpen, onToggle } = useDisclosure()
+  const { isSuccess, data } = useQuery(
+    ["courses", props.router.query.course, "modules", props.module.id.toString(), "items"],
+    async () => getData<Item[]>(`courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details&per_page=50`)
+  );
 
   return (
     <div>
@@ -65,7 +70,7 @@ function Module(props: {module: Module; router: NextRouter}) {
       </div>
       {isOpen ? (
         <div className="bg-zinc-100 dark:bg-[#222224] -translate-y-1 z-10 relative pt-1 rounded-b mx-1">
-          {props.module.items.map((item) =>
+          {data?.map((item) =>
             item.type == "SubHeader" ? (
               <Heading
                 cursor="pointer"
@@ -78,22 +83,7 @@ function Module(props: {module: Module; router: NextRouter}) {
                 {item.title}
               </Heading>
             ) : (
-              <ItemWrapper data={item} router={props.router} key={item.id}>
-                <Text
-                  cursor="pointer"
-                  className="hover:underline"
-                  p="4"
-                  pl={4 + item.indent * 4}
-                >
-                  {
-                    <FontAwesomeIcon
-                      icon={getIcon(item.type)}
-                      className="pr-4 pl-2"
-                    />
-                  }
-                  {item.title}
-                </Text>
-              </ItemWrapper>
+              <ItemView item={item} router={props.router} key={item.id} />
             )
           )}
         </div>
@@ -101,6 +91,40 @@ function Module(props: {module: Module; router: NextRouter}) {
         ""
       )}
     </div>
+  );
+}
+
+function ItemView(props: {item: Item; router: NextRouter}) {
+  const { item, router } = props
+  return (
+    <PrefetchWrapper prefetch={() => prefetch(item, router.query.course as string)}>
+      <ItemWrapper data={item} router={router}>
+        <div className="flex">
+          <Box cursor="pointer" p="4" pl={4 + item.indent * 4} display="flex">
+            <div className="grid content-center">
+              <FontAwesomeIcon icon={getIcon(item.type)} className="pr-4 pl-2" />
+            </div>
+            <div>
+              <span className="hover:underline">{item.title}</span>
+              {item.content_details.due_at ? (
+                <p className="text-zinc-400 text-xs">
+                  {parseDate(item.content_details.due_at)}
+                </p>
+              ) : (
+                ""
+              )}
+            </div>
+            {item.content_details.locked ? (
+              <div className="grid content-center">
+                <FontAwesomeIcon icon={faLock} className="px-2 text-zinc-400" size="xs" />
+              </div>
+            ) : (
+              ""
+            )}
+          </Box>
+        </div>
+      </ItemWrapper>
+    </PrefetchWrapper>
   );
 }
 
@@ -117,6 +141,39 @@ function getIcon(type: Type) {
   }
 }
 
+function prefetch(item: Item, courseID: string) {
+  switch (item.type) {
+    case "Assignment":
+      return queryClient.prefetchQuery(
+        ["courses", courseID, "assignments", item.content_id.toString()],
+        async () =>
+          getData<Assignment>(
+            `courses/${courseID}/assignments/${item.content_id}`
+          )
+      );
+    case "Discussion":
+      return queryClient.prefetchQuery(
+        ["courses", courseID, "discussions", item.content_id.toString()],
+        async () =>
+          getData<Discussion>(
+            `courses/${courseID}/discussion_topics/${item.content_id}`
+          )
+      );
+    case "File":
+      return queryClient.prefetchQuery(
+        ["courses", courseID, "file", item.content_id.toString()],
+        async () =>
+          await getData<File>(`courses/${courseID}/files/${item.content_id}`)
+      );
+    case "Page":
+      return queryClient.prefetchQuery(
+        ["courses", courseID, "pages", item.page_url],
+        async () =>
+          getData<Page>(`courses/${courseID}/pages/${item.content_id}`)
+      );
+  }
+}
+
 export function ItemWrapper(props: { children: JSX.Element; data: Item; router: NextRouter }): JSX.Element {
   const { children, data, router } = props;
 
@@ -124,11 +181,11 @@ export function ItemWrapper(props: { children: JSX.Element; data: Item; router: 
     case "Assignment":
       return <Link href={["/courses", router.query.course, "assignments", data.content_id].join("/") + `?moduleItem=${data.id}`}>{children}</Link>;
     case "Discussion":
-      return <Link href="/">{children}</Link>;
+      return <Link href={["/courses", router.query.course, "discussion_topics", data.content_id].join("/") + `?moduleItem=${data.id}`}>{children}</Link>;
     case "ExternalTool":
       return <Link href="/">{children}</Link>;
     case "ExternalUrl":
-      return <a href={data.external_url} target="_blank">{children}</a>;
+      return <a href={data.external_url} rel="noreferrer" target="_blank">{children}</a>;
     case "File":
       return <Link href={["/courses", router.query.course, "files", data.content_id].join("/") + `?moduleItem=${data.id}`}>{children}</Link>;
     case "Page":

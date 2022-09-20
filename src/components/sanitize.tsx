@@ -10,7 +10,7 @@ export default function Sanitizer(props: { html: string; header?: ReactNode}) {
 
   useEffect(() => {
     clean(props.html, ref, router);
-  }, [props.html]);
+  }, [props.html, router]);
 
   return (
     <main className="bg p-6 flex flex-col space-y-6 place-items-center">
@@ -55,6 +55,7 @@ export function clean(
       }
     } else if (a.href.startsWith("http")) {
       a.target = "_blank";
+      a.rel = "noreferrer";
     }
     a.classList.add("text-sky-400");
   });

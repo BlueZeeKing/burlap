@@ -3,27 +3,25 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { CourseLayout } from "../../../../components/layout";
 import { getData } from "../../../../lib/fetch";
-import { Assignment } from "../../../../types/api";
+import { Discussion } from "../../../../types/api";
 
-export default function AssignmentList() {
+export default function DiscussionList() {
   const router = useRouter();
 
   const { isSuccess, data } = useQuery(
-    ["courses", router.query.course, "assignments"],
+    ["courses", router.query.course, "discussions"],
     async () =>
-      getData<Assignment[]>(
-        `courses/${router.query.course}/assignments`
-      )
+      getData<Discussion[]>(`courses/${router.query.course}/discussion_topics`)
   );
 
   return (
     <CourseLayout isSuccess={isSuccess}>
-      <AssignmentView data={data} />
+      <DiscussionView data={data} />
     </CourseLayout>
   );
 }
 
-function AssignmentView(props: { data: Assignment[] }) {
+function DiscussionView(props: { data: Discussion[] }) {
   const { data } = props;
 
   const router = useRouter();
@@ -37,7 +35,7 @@ function AssignmentView(props: { data: Assignment[] }) {
           )}
           key={item.id}
         >
-          {item.name}
+          {item.title}
         </Link>
       ))}
     </main>

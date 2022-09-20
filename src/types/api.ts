@@ -60,6 +60,7 @@ export interface Item {
   type: Type;
   external_url: string;
   page_url: string;
+  content_details: { completed: boolean; due_at: string; locked: boolean };
 }
 
 export interface Announcement {
@@ -119,4 +120,20 @@ export interface File {
   url: string;
   "content-type": string;
   filename: string;
+}
+
+export interface Discussion {
+  id: number;
+  title: string;
+  message: string;
+  posted_at: string;
+  last_reply_at: string;
+  require_initial_post: boolean;
+  user_can_see_posts: boolean;
+  subscribed: boolean;
+  delayed_post_at: string | null;
+  lock_at: null;
+  locked: false;
+  lock_explanation: "This discussion is locked until September 1 at 12:00am";
+  user_name: "User Name";
 }

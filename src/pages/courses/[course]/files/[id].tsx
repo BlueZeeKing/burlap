@@ -18,7 +18,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/l
 
 export default function FilePage() {
   const router = useRouter()
-  const { isSuccess, data } = useQuery(["courses", router.query.course, "file", router], async () => await getData<File>(`courses/${router.query.course}/files/${router.query.id}`))
+  const { isSuccess, data } = useQuery(["courses", router.query.course, "file", router.query.id], async () => await getData<File>(`courses/${router.query.course}/files/${router.query.id}`))
 
   return (
     <CourseLayout isSuccess={isSuccess}><FileView data={data} /></CourseLayout>
