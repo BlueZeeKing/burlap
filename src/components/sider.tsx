@@ -95,7 +95,7 @@ function Sidebar() {
           <div className="fixed bottom-0 left-0 p-3 z-50">
             <Button
               onClick={() => {
-                //setSidebarWidth(200);
+                setSidebarWidth(200);
                 onOpen();
               }}
             >

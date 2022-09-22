@@ -53,7 +53,8 @@ function Module(props: {module: Module; router: NextRouter}) {
   const { isOpen, onToggle } = useDisclosure()
   const { isSuccess, data } = useQuery(
     ["courses", props.router.query.course, "modules", props.module.id.toString(), "items"],
-    async () => getData<Item[]>(`courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details&per_page=50`)
+    async () => getData<Item[]>(`courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details&per_page=50`),
+    {cacheTime: 15 * 1000}
   );
 
   return (
