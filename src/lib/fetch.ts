@@ -17,14 +17,18 @@ export async function getData<T>(url: string) {
   return body.data as T
 }
 
-export async function deleteData<T>(url: string) {
+export async function submitAssignment<T>(course: string, assignment: string, query: Record<string, any>) {
   const key = await getKey();
-  const body = await fetch(`https://apsva.instructure.com/api/v1/${url}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${key}`,
+  const body = await fetch(
+    `https://apsva.instructure.com/api/v1/courses/${course}/assignments/${assignment}/submissions`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+      },
+      query: query
     }
-  });
+  );
 
   if (!body.ok) throw body.status;
 

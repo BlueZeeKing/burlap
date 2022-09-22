@@ -4,20 +4,25 @@ import { CourseLayout } from "../../../../components/layout";
 import Sanitizer from "../../../../components/sanitize";
 import SequenceButtons from "../../../../components/sequencebuttons";
 import { parseDate } from "../../../../lib/date";
-import { deleteData, getData, uploadFile } from "../../../../lib/fetch";
+import { getData, submitAssignment, uploadFile } from "../../../../lib/fetch";
 import { Assignment, SubmissionType } from "../../../../types/api";
-import { Tabs, TabList, TabPanels, Tab, TabPanel, Button, Spinner } from "@chakra-ui/react";
+import { Tabs, TabList, TabPanels, Tab, TabPanel, Button, Spinner, Textarea } from "@chakra-ui/react";
 
-import { once } from "@tauri-apps/api/event";
 import { open } from "@tauri-apps/api/dialog";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { parse } from "path";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faClose, faPaperPlane, faSpinner, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faClose, faPaperPlane, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { fetch } from "@tauri-apps/api/http";
 import { getKey } from "../../../../lib/auth";
+import { Converter } from "showdown";
+import DOMPurify from "isomorphic-dompurify";
 
-const submissionTypeKey = {"online_upload": "File Upload", "external_tool": "External Tool"}
+import { motion } from "framer-motion"
+
+const converter = new Converter();
+
+const submissionTypeKey = {"online_upload": "File Upload", "external_tool": "External Tool", "online_text_entry": "Text Entry"}
 
 export default function AssignmentPage() {
   const router = useRouter();
@@ -82,13 +87,13 @@ function InternalTabPanel(props: {item: SubmissionType; course: string; assignme
   switch (props.item) {
     case "online_upload":
       return <UploadTab course={props.course} assignment={props.assignment} />;
+    case "online_text_entry":
+      return <TextTab course={props.course} assignment={props.assignment} />;
     case "external_tool":
       return (
         <TabPanel className="grid place-content-center">
           <a href="">
-            <Button colorScheme="blue">
-              Open in Browser
-            </Button>
+            <Button colorScheme="blue">Open in Browser</Button>
           </a>
         </TabPanel>
       );
@@ -103,32 +108,71 @@ function InternalTabPanel(props: {item: SubmissionType; course: string; assignme
 
 interface File {name: string, path: string}
 
+function TextTab(props: { course: string; assignment: string }) {
+  const [text, setText] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
+
+  const submit = useMutation(async (text: string) => {
+    return submitAssignment(props.course, props.assignment, {
+      "submission[submission_type]": "online_upload",
+      "submission[body]": DOMPurify.sanitize(converter.makeHtml(text)),
+    });
+  })
+
+  return (
+    <TabPanel>
+      <div className="pb-4">
+        <button
+          onClick={() => setShowPreview(false)}
+          className={`rounded-l-md w-20 py-1 border-zinc-600 border-r ${
+            !showPreview ? "bg-sky-400" : "bg-zinc-700"
+          }`}
+        >
+          Source
+        </button>
+        <button
+          onClick={() => setShowPreview(true)}
+          className={`rounded-r-md w-20 py-1 ${
+            showPreview ? "bg-sky-400" : "bg-zinc-700"
+          }`}
+        >
+          Preview
+        </button>
+      </div>
+      {showPreview ? (
+        <div
+          className="prose dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(converter.makeHtml(text)),
+          }}
+        />
+      ) : (
+        <Textarea value={text} onChange={(e) => setText(e.target.value)} />
+      )}
+      <Button
+        colorScheme="blue"
+        leftIcon={
+          submit.isLoading ? (
+            <Spinner />
+          ) : (
+            <FontAwesomeIcon icon={submit.isSuccess ? faCheck : faPaperPlane} />
+          )
+        }
+        onClick={() => submit.mutate(text)}
+        my="4"
+      >
+        Submit
+      </Button>
+    </TabPanel>
+  );
+}
+
 function UploadTab(props: { course: string; assignment: string }) {
   const [files, setFiles] = useState<File[]>([]);
 
   const addFile = (file: File) => {
     setFiles([file, ...files]);
   };
-
-  /*useEffect(() => {
-    let active = true;
-
-    const handleEvent = async (event) => {
-      if (active) {
-        event.payload.forEach((item: string) => {
-          let name = parse(item as string).base;
-          addFile({name: name, path: item})
-        })
-        once("tauri://file-drop", handleEvent);
-      }
-    };
-
-    once("tauri://file-drop", handleEvent);
-
-    return () => {
-      active = false;
-    };
-  }, []);*/
 
   const submit = useMutation(
     async (payload: File[]) => {
@@ -145,42 +189,15 @@ function UploadTab(props: { course: string; assignment: string }) {
         return code
       }))
 
-      const key = await getKey();
-      const body = await fetch(
-        `https://apsva.instructure.com/api/v1/courses/${props.course}/assignments/${props.assignment}/submissions`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${key}`,
-          },
-          query: {
-            "submission[submission_type]": "online_upload",
-            "submission[file_ids][]": ids.join(","),
-          },
-        }
-      );
-
-      if (body.ok) return
-      throw body.status
+      const body = await submitAssignment(props.course, props.assignment, {
+        "submission[submission_type]": "online_upload",
+        "submission[file_ids][]": ids.join(","),
+      });
     }
   );
 
   return (
-    <TabPanel className="grid place-content-center">
-      <Button
-        onClick={async () => {
-          const path = await open();
-          if (path == null) return;
-          let name = parse(path as string).base;
-          addFile({ name: name, path: path as string });
-        }}
-        m="4"
-        colorScheme="blue"
-        leftIcon={<FontAwesomeIcon icon={faUpload} />}
-        variant="outline"
-      >
-        Click to Upload
-      </Button>
+    <TabPanel>
       <ul className="list-disc w-full pb-4">
         {files.map((item, index) => (
           <li key={index}>
@@ -202,14 +219,35 @@ function UploadTab(props: { course: string; assignment: string }) {
           </li>
         ))}
       </ul>
-      <Button
-        colorScheme="blue"
-        leftIcon={submit.isLoading ? <Spinner /> : <FontAwesomeIcon icon={submit.isSuccess ? faCheck : faPaperPlane} />}
-        onClick={() => submit.mutate(files)}
-        disabled={files.length == 0}
-      >
-        Submit
-      </Button>
+      <div className="flex space-x-4 place-content-center">
+        <Button
+          onClick={async () => {
+            const path = await open();
+            if (path == null) return;
+            let name = parse(path as string).base;
+            addFile({ name: name, path: path as string });
+          }}
+          colorScheme="blue"
+          leftIcon={<FontAwesomeIcon icon={faUpload} />}
+          variant="outline"
+        >
+          Upload
+        </Button>
+        <Button
+          colorScheme="blue"
+          leftIcon={
+            submit.isLoading ? (
+              <Spinner />
+            ) : (
+              <FontAwesomeIcon icon={submit.isSuccess ? faCheck : faPaperPlane} />
+            )
+          }
+          onClick={() => submit.mutate(files)}
+          disabled={files.length == 0}
+        >
+          Submit
+        </Button>
+      </div>
     </TabPanel>
   );
 }
