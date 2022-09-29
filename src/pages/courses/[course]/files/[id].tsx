@@ -13,6 +13,7 @@ import { useState } from "react";
 import SequenceButtons from "../../../../components/sequencebuttons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { useBreadcrumb } from "../../../../lib/breadcrumb";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
 
@@ -26,8 +27,11 @@ export default function FilePage() {
 }
 
 function FileView(props: {data: File}) {
+  const router = useRouter()
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useBreadcrumb([2, props.data.display_name, router.asPath]);
 
   function removeTextLayerOffset() {
     const textLayers = document.querySelectorAll(

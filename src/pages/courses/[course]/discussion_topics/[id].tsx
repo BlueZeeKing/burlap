@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { CourseLayout } from "../../../../components/layout";
 import Sanitizer, { clean } from "../../../../components/sanitize";
 import SequenceButtons from "../../../../components/sequencebuttons";
+import { useBreadcrumb } from "../../../../lib/breadcrumb";
 import { parseDate } from "../../../../lib/date";
 import { getData } from "../../../../lib/fetch";
 import { Discussion } from "../../../../types/api";
@@ -59,6 +60,8 @@ function DiscussionView(props: { data: Discussion; viewData: DiscussionView; vie
   const { data, viewData, viewDataReady } = props;
 
   const router = useRouter()
+
+  useBreadcrumb([2, data.title, router.asPath]);
 
   return (
     <div>

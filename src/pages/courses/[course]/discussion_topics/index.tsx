@@ -2,11 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { CourseLayout } from "../../../../components/layout";
+import { useBreadcrumb } from "../../../../lib/breadcrumb";
 import { getData } from "../../../../lib/fetch";
 import { Discussion } from "../../../../types/api";
 
 export default function DiscussionList() {
   const router = useRouter();
+
+  useBreadcrumb([1, "Discussions", router.asPath]);
 
   const { isSuccess, data } = useQuery(
     ["courses", router.query.course, "discussions"],

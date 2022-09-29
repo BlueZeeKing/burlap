@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { CourseLayout } from "../../../../components/layout";
 import Sanitizer from "../../../../components/sanitize";
 import SequenceButtons from "../../../../components/sequencebuttons";
+import { useBreadcrumb } from "../../../../lib/breadcrumb";
 import { getData } from "../../../../lib/fetch";
 import { Page } from "../../../../types/api";
 
@@ -24,6 +25,9 @@ export default function PageApp() {
 
 function PageView(props: { data: Page }) {
   const { data } = props
+  const router = useRouter();
+
+  useBreadcrumb([2, data.title, router.asPath]);
 
   return (
     <div>

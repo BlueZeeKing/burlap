@@ -23,6 +23,7 @@ import { Module, Item, Type, Assignment, Discussion, Page } from "../../../types
 import { parseDate } from "../../../lib/date";
 import PrefetchWrapper from "../../../components/prefetcher";
 import { queryClient } from "../../_app";
+import { useBreadcrumb } from "../../../lib/breadcrumb";
 
 export default function Modules() {
   const router = useRouter()
@@ -31,6 +32,8 @@ export default function Modules() {
     ["courses", router.query.course, "modules"],
     async () => getData<Module[]>(`courses/${router.query.course}/modules`),
   );
+
+  useBreadcrumb([1, "Modules", router.asPath]);
 
   return (
     <CourseLayout isSuccess={isSuccess}>

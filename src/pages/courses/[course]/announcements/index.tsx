@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { CourseLayout } from "../../../../components/layout";
+import { useBreadcrumb } from "../../../../lib/breadcrumb";
 import { getData } from "../../../../lib/fetch";
 import { Announcement } from "../../../../types/api";
 
@@ -15,6 +16,8 @@ export default function AnnouncementList() {
         `courses/${router.query.course}/discussion_topics?only_announcements=true`
       )
   );
+
+  useBreadcrumb([1, "Announcements", router.asPath]);
 
   return (
     <CourseLayout isSuccess={isSuccess}>

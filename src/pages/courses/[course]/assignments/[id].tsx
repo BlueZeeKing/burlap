@@ -19,6 +19,7 @@ import { Converter } from "showdown";
 import DOMPurify from "isomorphic-dompurify";
 
 import { motion } from "framer-motion"
+import { useBreadcrumb } from "../../../../lib/breadcrumb";
 
 const converter = new Converter();
 
@@ -43,6 +44,8 @@ export default function AssignmentPage() {
 function AssignmentView(props: { data: Assignment }) {
   const { data } = props
   const router = useRouter()
+
+  useBreadcrumb([2, data.name, router.asPath]);
 
   return (
     <div>

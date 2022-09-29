@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { CourseLayout } from "../../../../components/layout";
 import Sanitizer from "../../../../components/sanitize";
+import { useBreadcrumb } from "../../../../lib/breadcrumb";
 import { parseDate } from "../../../../lib/date";
 import { getData } from "../../../../lib/fetch";
 import { Announcement } from "../../../../types/api";
@@ -26,6 +27,9 @@ export default function AnnouncementPage() {
 
 function AnnouncementView(props: { data: Announcement }) {
   const { data } = props;
+  const router = useRouter();
+
+  useBreadcrumb([2, data.title, router.asPath]);
 
   return (
     <Sanitizer

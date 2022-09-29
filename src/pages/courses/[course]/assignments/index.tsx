@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { CourseLayout } from "../../../../components/layout";
+import { useBreadcrumb } from "../../../../lib/breadcrumb";
 import { getData } from "../../../../lib/fetch";
 import { Assignment } from "../../../../types/api";
 
@@ -15,6 +16,8 @@ export default function AssignmentList() {
         `courses/${router.query.course}/assignments`
       )
   );
+
+  useBreadcrumb([1, "Assignments", router.asPath]);
 
   return (
     <CourseLayout isSuccess={isSuccess}>

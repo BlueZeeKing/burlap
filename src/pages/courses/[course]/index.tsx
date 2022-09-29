@@ -7,10 +7,12 @@ import Wiki from "./home";
 import Syllabus from "./syllabus";
 import Modules from "./modules";
 import { CourseLayout } from "../../../components/layout";
+import { useEffect } from "react";
+import { setBreadcrumb } from "../../../lib/breadcrumb";
 
 export default function Home() {
   const router = useRouter()
-  const {data, isSuccess} = useQuery(["courses", router.query.course], async () => await getData<Course>("courses/"+router.query.course))
+  const {data, isSuccess} = useQuery(["courses", router.query.course], async () => await getData<Course>("courses/"+router.query.course), {onSuccess: (data) => setBreadcrumb(0, data.name, router.asPath)})
 
   if (isSuccess) {
     switch (data.default_view) {
