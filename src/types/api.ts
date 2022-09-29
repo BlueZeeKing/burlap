@@ -89,6 +89,9 @@ export interface Assignment {
   due_at: string;
   submission_types: SubmissionType[];
   has_submitted_submissions: boolean;
+  external_tool_tag_attributes: {
+    url: string;
+  };
 }
 
 export type SubmissionType =

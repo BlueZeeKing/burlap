@@ -6,7 +6,7 @@ import SequenceButtons from "../../../../components/sequencebuttons";
 import { parseDate } from "../../../../lib/date";
 import { getData, submitAssignment, uploadFile } from "../../../../lib/fetch";
 import { Assignment, SubmissionType } from "../../../../types/api";
-import { Tabs, TabList, TabPanels, Tab, TabPanel, Button, Spinner, Textarea } from "@chakra-ui/react";
+import { Tabs, TabList, TabPanels, Tab, TabPanel, Button, Spinner, Textarea, Alert, AlertTitle, AlertIcon, AlertDescription } from "@chakra-ui/react";
 
 import { open } from "@tauri-apps/api/dialog";
 import { useState } from "react";
@@ -114,7 +114,7 @@ function TextTab(props: { course: string; assignment: string }) {
 
   const submit = useMutation(async (text: string) => {
     return submitAssignment(props.course, props.assignment, {
-      "submission[submission_type]": "online_upload",
+      "submission[submission_type]": "online_text_entry",
       "submission[body]": DOMPurify.sanitize(converter.makeHtml(text)),
     });
   })
@@ -193,11 +193,16 @@ function UploadTab(props: { course: string; assignment: string }) {
         "submission[submission_type]": "online_upload",
         "submission[file_ids][]": ids.join(","),
       });
-    }
+    },
+    { onSuccess: () => setFiles([])}
   );
 
   return (
     <TabPanel>
+      <Alert status="error" variant="left-accent">
+        <AlertIcon />
+        Only one will be submitted
+      </Alert>
       <ul className="list-disc w-full pb-4">
         {files.map((item, index) => (
           <li key={index}>
@@ -239,7 +244,9 @@ function UploadTab(props: { course: string; assignment: string }) {
             submit.isLoading ? (
               <Spinner />
             ) : (
-              <FontAwesomeIcon icon={submit.isSuccess ? faCheck : faPaperPlane} />
+              <FontAwesomeIcon
+                icon={submit.isSuccess ? faCheck : faPaperPlane}
+              />
             )
           }
           onClick={() => submit.mutate(files)}
