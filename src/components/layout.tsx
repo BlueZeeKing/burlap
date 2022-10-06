@@ -2,7 +2,7 @@ import { BreadcrumbItem, Breadcrumb, BreadcrumbSeparator, BreadcrumbLink } from 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useBreadcrumb } from "../lib/breadcrumb";
 import { getData } from "../lib/fetch";
 import { Course } from "../types/api";
@@ -13,17 +13,17 @@ import Sidebar from "./sider";
 export function CourseLayout(props: {isSuccess: boolean; children: ReactNode}) {
   const router = useRouter()
   const { data } = useQuery(["courses", router.query.course], async () => await getData<Course>("courses/"+router.query.course));
+  const [width, setWidth] = useState(0)
   
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen grid flex-col course-layout" style={{gridTemplateColumns: `${width}px 1fr`, gridTemplateRows: "6rem 1fr"}}>
       <Header text={data?.name} />
 
-      <Sidebar>
-        <>
-          <BreadcrumbElement />
-          {props.isSuccess ? props.children : <Loader />}
-        </>
-      </Sidebar>
+      <Sidebar sidebarWidth={width} setSidebarWidth={setWidth} />
+      <div className="bg overflow-scroll" style={{gridArea: "main"}}>
+        <BreadcrumbElement />
+        {props.isSuccess ? props.children : <Loader />}
+      </div>
     </div>
   );
 }

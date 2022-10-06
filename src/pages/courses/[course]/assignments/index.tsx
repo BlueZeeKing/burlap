@@ -13,7 +13,7 @@ export default function AssignmentList() {
     ["courses", router.query.course, "assignments"],
     async () =>
       getData<Assignment[]>(
-        `courses/${router.query.course}/assignments`
+        `courses/${router.query.course}/assignments?per_page=50`
       )
   );
 

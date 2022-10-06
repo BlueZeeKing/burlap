@@ -33,7 +33,7 @@ function DiscussionView(props: { data: Discussion[] }) {
     <main className="bg p-6 flex flex-col space-y-6">
       {data.map((item) => (
         <Link
-          href={["/courses", router.query.course, "assignments", item.id].join(
+          href={["/courses", router.query.course, "discussion_topics", item.id].join(
             "/"
           )}
           key={item.id}

@@ -8,7 +8,10 @@ import { getData } from "../lib/fetch";
 import { queryClient } from "./_app";
 import { Page, Course, Module, Assignment, Tab, DashboardCourse } from "../types/api";
 import PrefetchWrapper from "../components/prefetcher";
-import { LinkBox, LinkOverlay } from "@chakra-ui/react";
+import { Box, LinkBox, LinkOverlay } from "@chakra-ui/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGripHorizontal, faGripVertical } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useRef, useState } from "react";
 
 export default function App() {
   const {data, isSuccess} = useQuery(["dashboard"], async () => await getData<DashboardCourse[]>("dashboard/dashboard_cards"))
@@ -22,28 +25,92 @@ export default function App() {
   );
 }
 
+interface MovingCourseData {
+  id: number,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+}
+
 function AppView(props: { data: DashboardCourse[] }) {
+  const [movingCourse, setMovingCourse] = useState<MovingCourseData | undefined>();
+  
   return (
     <main className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 auto-rows-max bg gap-6 p-6 w-screen">
       {props.data.map((item) => (
-        <LinkBox key={item.id}>
-          <PrefetchWrapper prefetch={() => prefetch(item)} className="h-full">
-            <div className="h-full p-6 bg-white dark:bg-zinc-800 rounded border-zinc-300 dark:border-zinc-700 border cursor-pointer">
-              <h2 className="text-xl">
-                <Link href={`/courses/${item.id}`} passHref>
-                  <LinkOverlay>
-                    {item.shortName}
-                  </LinkOverlay>
-                </Link>
-              </h2>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                {item.courseCode}
-              </p>
-            </div>
-          </PrefetchWrapper>
-        </LinkBox>
+        <CourseItem key={item.id} item={item} setMovingCourse={setMovingCourse} clicked={item.id == movingCourse?.id} />
       ))}
+      {movingCourse ? <MovingCourseItem setMovingCourse={setMovingCourse} item={props.data.find((item) => item.id == movingCourse.id)} data={movingCourse} /> : ""}
     </main>
+  );
+}
+
+function CourseItem(props: {item: DashboardCourse; setMovingCourse: (a: MovingCourseData) => void; clicked: boolean}) {
+  const {item, setMovingCourse} = props
+  const ref = useRef<HTMLDivElement>(null)
+
+  return (
+    <LinkBox key={item.id} as="article">
+      <PrefetchWrapper prefetch={() => prefetch(item)} className="h-full">
+        <div className={`h-full p-8 bg-white dark:bg-zinc-800 rounded border-zinc-300 dark:border-zinc-700 border cursor-pointer relative set-opacity-wrapper ${props.clicked ? "opacity-0" : "opacity-100"}`} ref={ref}>
+          <div
+            onMouseDown={(e) => {
+              const { left, top, width, height } = ref.current.getBoundingClientRect();
+              setMovingCourse({
+                id: item.id,
+                x: left,
+                y: top,
+                width: width,
+                height: height,
+              });
+              pauseEvent(e)
+            }}
+            className={`set-opacity absolute z-50 left-3 top-[50%] -translate-y-[50%] opacity-0 transition-opacity ${
+              props.clicked ? "cursor-grabbing" : "cursor-grab"
+            }`}
+          >
+            <FontAwesomeIcon icon={faGripVertical} className="text-zinc-600" />
+          </div>
+          <h2 className="text-xl flex flex-row">
+            <Link href={`/courses/${item.id}`} passHref>
+              <LinkOverlay>{item.shortName}</LinkOverlay>
+            </Link>
+          </h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            {item.courseCode}
+          </p>
+        </div>
+      </PrefetchWrapper>
+    </LinkBox>
+  );
+}
+
+function MovingCourseItem(props: {item: DashboardCourse; data: MovingCourseData; setMovingCourse: (a: undefined) => void}) {
+  const [pos, setPos] = useState<[number, number]>([props.data.x, props.data.y])
+  useEffect(() => {
+    const mouseMoveHandler = (e) => {
+      pauseEvent(e);
+      setPos([pos[0]+e.movementX, pos[1]+e.movementY])
+    };
+
+    window.addEventListener("mousemove", mouseMoveHandler);
+
+    return () => window.removeEventListener("mousemove", mouseMoveHandler);
+  })
+
+  return (
+    <div style={{top: pos[1], left: pos[0], width: props.data.width, height: props.data.height}} className="p-8 bg-white dark:bg-zinc-800 rounded border-zinc-300 dark:border-zinc-700 border cursor-pointer fixed set-opacity-wrapper" onMouseUp={() => props.setMovingCourse(undefined)}>
+      <div
+        className="set-opacity absolute z-50 left-3 top-[50%] -translate-y-[50%] opacity-0 transition-opacity cursor-grabbing"
+      >
+        <FontAwesomeIcon icon={faGripVertical} className="text-zinc-600" />
+      </div>
+      <h2 className="text-xl flex flex-row">{props.item.shortName}</h2>
+      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        {props.item.courseCode}
+      </p>
+    </div>
   );
 }
 
@@ -94,4 +161,12 @@ export function prefectDefaultView(item: Course) {
       );
       return;
   }
+}
+
+function pauseEvent(e) {
+  if (e.stopPropagation) e.stopPropagation();
+  if (e.preventDefault) e.preventDefault();
+  e.cancelBubble = true;
+  e.returnValue = false;
+  return false;
 }

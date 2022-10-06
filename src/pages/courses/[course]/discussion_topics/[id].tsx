@@ -1,14 +1,20 @@
-import { Avatar } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
+import { Avatar, Button, Spinner, Textarea } from "@chakra-ui/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { NextRouter, useRouter } from "next/router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CourseLayout } from "../../../../components/layout";
 import Sanitizer, { clean } from "../../../../components/sanitize";
 import SequenceButtons from "../../../../components/sequencebuttons";
 import { useBreadcrumb } from "../../../../lib/breadcrumb";
 import { parseDate } from "../../../../lib/date";
-import { getData } from "../../../../lib/fetch";
+import { getData, uploadDiscussionResponse } from "../../../../lib/fetch";
 import { Discussion } from "../../../../types/api";
+import { Converter } from "showdown";
+import DOMPurify from "isomorphic-dompurify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+
+const converter = new Converter();
 
 interface DiscussionView {
   unread_entries: number[];
@@ -74,8 +80,74 @@ function DiscussionView(props: { data: Discussion; viewData: DiscussionView; vie
         }
         html={data.message}
       />
+      {data.locked ? "" : <DiscussionSubmissionView router={router} />}
       {viewDataReady ? viewData.view.map((item) => <DiscussionEntryView entry={item} author={viewData.participants.find((user) => user.id == item.user_id)} router={router} key={item.id} />) : ""}
       <SequenceButtons />
+    </div>
+  );
+}
+
+function DiscussionSubmissionView(props: {
+  router: NextRouter;
+}) {
+
+  const [text, setText] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
+
+  const mutation = useMutation(async (text: string) => {
+    uploadDiscussionResponse(
+      props.router.query.course as string,
+      props.router.query.id as string,
+      text
+    );
+  })
+
+  return (
+    <div className="bg-zinc-200 dark:bg-zinc-800 p-4 m-4 rounded border-zinc-300 dark:border-zinc-700 border">
+      <div className="pb-4">
+        <button
+          onClick={() => setShowPreview(false)}
+          className={`rounded-l-md w-20 py-1 border-zinc-600 border-r ${
+            !showPreview ? "bg-sky-400" : "bg-zinc-700"
+          }`}
+        >
+          Source
+        </button>
+        <button
+          onClick={() => setShowPreview(true)}
+          className={`rounded-r-md w-20 py-1 ${
+            showPreview ? "bg-sky-400" : "bg-zinc-700"
+          }`}
+        >
+          Preview
+        </button>
+      </div>
+      {showPreview ? (
+        <div
+          className="prose dark:prose-invert max-w-none"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(converter.makeHtml(text)),
+          }}
+        />
+      ) : (
+        <Textarea value={text} onChange={(e) => setText(e.target.value)} />
+      )}
+      <Button
+        colorScheme="blue"
+        leftIcon={
+          mutation.isLoading ? (
+            <Spinner />
+          ) : (
+            <FontAwesomeIcon
+              icon={mutation.isSuccess ? faCheck : faPaperPlane}
+            />
+          )
+        }
+        onClick={() => mutation.mutate(text)}
+        my="4"
+      >
+        Submit
+      </Button>
     </div>
   );
 }

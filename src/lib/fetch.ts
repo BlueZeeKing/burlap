@@ -71,3 +71,29 @@ export async function uploadFile(url: string, name: string, fileData: Uint8Array
 
   return response.id;
 }
+
+export async function uploadDiscussionResponse<T>(
+  course: string,
+  discussion: string,
+  message: string
+) {
+  const key = await getKey();
+  const body = await fetch(
+    `https://apsva.instructure.com/api/v1/courses/${course}/discussion_topics/${discussion}/entries`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+      },
+      query: {
+        message: message,
+      },
+    }
+  );
+
+  console.log(body)
+
+  if (!body.ok) throw body.status;
+
+  return body.data as T;
+}

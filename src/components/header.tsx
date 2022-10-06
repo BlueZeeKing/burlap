@@ -12,7 +12,7 @@ export default function Header(props: {text?: string}) {
   const unread = useQuery(["unread"], async () => await getData<Unread>("conversations/unread_count"), {staleTime: 500});
 
   return (
-    <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex col-span-2">
+    <div className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex col-span-2" style={{gridArea: "header"}}>
       <div className="h-full p-4">
         <PrefetchWrapper className="h-full aspect-square" prefetch={() => queryClient.prefetchQuery(["dashboard"], async () => await getData<DashboardCourse[]>("dashboard/dashboard_cards"))}>
           <Logo className="cursor-pointer" />

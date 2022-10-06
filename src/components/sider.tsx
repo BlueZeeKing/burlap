@@ -1,4 +1,4 @@
-import { Button, useDisclosure } from "@chakra-ui/react";
+import { Button, IconButton, useDisclosure } from "@chakra-ui/react";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
@@ -9,17 +9,11 @@ import { getData } from "../lib/fetch";
 import { queryClient } from "../pages/_app";
 import { Tab, Module, Assignment, Announcement, Discussion } from "../types/api";
 import PrefetchWrapper from "./prefetcher";
+import Resizer from "./resizer";
 
-export default function SidebarWrapper(props: {children: ReactNode}) {
-  return (
-    <div className="flex flex-grow">
-      <Sidebar />
-      <div className="flex-grow bg basis-0">{props.children}</div>
-    </div>
-  )
-}
+export default function Sidebar(props: { sidebarWidth: number, setSidebarWidth: (a: number) => void }) {
+  const { sidebarWidth, setSidebarWidth } = props;
 
-function Sidebar() {
   const router = useRouter();
 
   const { data, isSuccess } = useQuery(
@@ -27,38 +21,8 @@ function Sidebar() {
     async () => await getData<Tab[]>(`courses/${router.query.course}/tabs`)
   );
 
-  const [isMouseDown, setMouseDown] = useState(false)
-  const {isOpen, onOpen, onClose} = useDisclosure()
-  const [sidebarWidth, setSidebarWidth] = useState(200);
-  const previewView = useDisclosure()
-
-  useEffect(() => {
-    const mouseUpHandler = () => {
-      setMouseDown(false)
-    }
-
-    window.addEventListener("mouseup", mouseUpHandler)
-
-    return () => window.removeEventListener("mouseup", mouseUpHandler)
-  }, [])
-
-  useEffect(() => {
-    const mouseMoveHandler = (e) => {
-      pauseEvent(e);
-      if (isMouseDown) {
-        if (e.clientX < 80) {
-          onClose()
-        } else {
-          setSidebarWidth(e.clientX)
-          window.localStorage.setItem("sidebar-width", e.clientX.toString());
-        }
-      }
-    };
-
-    window.addEventListener("mousemove", mouseMoveHandler);
-
-    return () => window.removeEventListener("mousemove", mouseMoveHandler);
-  }, [isMouseDown, onClose]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const previewView = useDisclosure();
 
   useEffect(() => {
     if (window.localStorage.getItem("sidebar-width") != null) {
@@ -66,25 +30,40 @@ function Sidebar() {
       setSidebarWidth(data);
     }
 
-    if (window.localStorage.getItem("sidebar-open") != null && window.localStorage.getItem("sidebar-open") == "true") {
+    if (
+      window.localStorage.getItem("sidebar-open") != null &&
+      window.localStorage.getItem("sidebar-open") == "true"
+    ) {
       onOpen();
+    } else {
+      setSidebarWidth(0);
     }
-  }, [onOpen]);
+  }, [onOpen, setSidebarWidth]);
 
   useEffect(() => {
     window.localStorage.setItem("sidebar-open", isOpen.toString());
   }, [isOpen]);
 
   return (
-    <>
+    <div className="grid col-span-1 row-span-1" style={{ gridArea: "sider" }}>
       {isOpen ? (
         <SiderInterior
           data={data}
           sidebarWidth={sidebarWidth}
           router={router}
-          isMouseDown={isMouseDown}
-          setMouseDown={setMouseDown}
           isResizable={true}
+          handleWidth={(width) => {
+            if (width < 80) {
+              onClose();
+              setSidebarWidth(0);
+            } else {
+              setSidebarWidth(width);
+              window.localStorage.setItem(
+                "sidebar-width",
+                width.toString()
+              );
+            }
+          }}
         />
       ) : (
         <>
@@ -93,14 +72,15 @@ function Sidebar() {
             onMouseEnter={previewView.onOpen}
           ></div>
           <div className="fixed bottom-0 left-0 p-3 z-50">
-            <Button
+            <IconButton
               onClick={() => {
                 setSidebarWidth(200);
                 onOpen();
               }}
+              aria-label="Open sidebar"
             >
               <FontAwesomeIcon icon={faChevronRight} />
-            </Button>
+            </IconButton>
           </div>
           {previewView.isOpen ? (
             <div className="fixed top-[50%] left-0 -translate-y-[50%] h-[600px] z-50">
@@ -108,11 +88,10 @@ function Sidebar() {
                 data={data}
                 sidebarWidth={250}
                 router={router}
-                isMouseDown={isMouseDown}
-                setMouseDown={setMouseDown}
                 isResizable={false}
                 onExit={previewView.onClose}
                 className="overflow-y-scroll h-[600px] rounded-r shadow"
+                handleWidth={() => {}}
               />
             </div>
           ) : (
@@ -120,12 +99,12 @@ function Sidebar() {
           )}
         </>
       )}
-    </>
+    </div>
   );
 }
 
-function SiderInterior(props: { sidebarWidth: number; router: NextRouter; isMouseDown: boolean; setMouseDown: (a: boolean) => void; data: Tab[]; isResizable: boolean; className?: string; onExit?: () => void }) {
-  const {sidebarWidth, router, isMouseDown, setMouseDown, data, isResizable, className, onExit} = props
+function SiderInterior(props: { sidebarWidth: number; router: NextRouter; data: Tab[]; isResizable: boolean; className?: string; onExit?: () => void; handleWidth: (a: number) => void }) {
+  const {sidebarWidth, router, handleWidth, data, isResizable, className, onExit} = props
 
   return (
     <aside
@@ -150,17 +129,8 @@ function SiderInterior(props: { sidebarWidth: number; router: NextRouter; isMous
             </Link>
           </PrefetchWrapper>
         ))}
-      { isResizable ? (
-      <div
-        className="h-full absolute right-0 w-4 cursor-col-resize top-0 translate-x-[50%] px-[0.37rem]"
-        onMouseDown={() => setMouseDown(true)}
-      >
-        <div
-          className={`${
-            isMouseDown ? "bg-opacity-100" : "bg-opacity-0"
-          } bg-sky-500 w-full h-full transition duration-200`}
-        ></div>
-      </div> ) : "" }
+      { isResizable ? 
+      <Resizer width={sidebarWidth} setWidth={handleWidth}  /> : "" }
     </aside>
   );
 }
@@ -173,14 +143,6 @@ function getURL(data: Tab, courseId: string) {
   } else {
     return "/404"
   }
-}
-
-function pauseEvent(e) {
-  if (e.stopPropagation) e.stopPropagation();
-  if (e.preventDefault) e.preventDefault();
-  e.cancelBubble = true;
-  e.returnValue = false;
-  return false;
 }
 
 const getPrefetch = (router: NextRouter, tab: Tab) => {

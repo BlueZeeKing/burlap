@@ -4,7 +4,7 @@
 
 @layer base {
   html, body {
-    @apply bg-zinc-200 dark:bg-zinc-900
+    @apply !bg-zinc-200 dark:!bg-zinc-900
   }
 }
 
@@ -15,5 +15,14 @@
 }
 
 .screenreader-only {
-    display: none;
-  }
+  display: none;
+}
+
+.course-layout {
+  grid-template-areas: "header header"
+                       "sider main";
+}
+
+.set-opacity-wrapper:hover > .set-opacity {
+  opacity: 1;
+}
