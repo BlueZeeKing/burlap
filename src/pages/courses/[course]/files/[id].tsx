@@ -14,6 +14,8 @@ import SequenceButtons from "../../../../components/sequencebuttons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { useBreadcrumb } from "../../../../lib/breadcrumb";
+import { useToast } from "@chakra-ui/react"
+import { open } from "@tauri-apps/api/shell"
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
 
@@ -32,6 +34,8 @@ function FileView(props: {data: File}) {
   const [currentPage, setCurrentPage] = useState(1);
 
   useBreadcrumb([2, props.data.display_name, router.asPath]);
+
+  const toast = useToast()
 
   function removeTextLayerOffset() {
     const textLayers = document.querySelectorAll(
@@ -85,6 +89,10 @@ function FileView(props: {data: File}) {
                 path: path,
                 contents: file,
               });
+              toast({
+                title: "File downloaded successfully",
+                status: "success",
+              })
             }}
           >
             Save

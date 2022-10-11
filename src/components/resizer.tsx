@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useState } from "react";
 
-export default function Resizer(props: {width: number, setWidth: (a: number) => void}) {
+export default function Resizer(props: {
+  width: number;
+  setWidth: (a: number) => void;
+  horizontal?: boolean;
+  parentRef?: MutableRefObject<HTMLDivElement>;
+}) {
   const [isMouseDown, setMouseDown] = useState(false);
 
   useEffect(() => {
@@ -11,13 +16,23 @@ export default function Resizer(props: {width: number, setWidth: (a: number) => 
     window.addEventListener("mouseup", mouseUpHandler);
 
     return () => window.removeEventListener("mouseup", mouseUpHandler);
-  }, []);
+  }, [props.parentRef]);
 
   useEffect(() => {
     const mouseMoveHandler = (e) => {
       pauseEvent(e);
       if (isMouseDown) {
-        props.setWidth(e.clientX);
+        props.setWidth(
+          !props.horizontal
+            ? (e.pageX -
+                (props.parentRef != undefined
+                  ? props.parentRef.current.getBoundingClientRect().left
+                  : 0)
+            ):( e.pageY -
+                (props.parentRef != undefined
+                  ? props.parentRef.current.getBoundingClientRect().top
+                  : 0))
+        );
       }
     };
 
@@ -28,7 +43,11 @@ export default function Resizer(props: {width: number, setWidth: (a: number) => 
 
   return (
     <div
-      className="h-full absolute right-0 w-4 cursor-col-resize top-0 translate-x-[50%] px-[0.37rem]"
+      className={`${
+        props.horizontal
+          ? "w-full -translate-y-[50%] cursor-row-resize h-4 py-[0.37rem]"
+          : "h-full translate-x-[50%] cursor-col-resize w-4 px-[0.37rem]"
+      } absolute right-0 top-0`}
       onMouseDown={() => setMouseDown(true)}
     >
       <div

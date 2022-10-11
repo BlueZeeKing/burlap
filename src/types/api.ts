@@ -1,3 +1,5 @@
+import { Submission } from "../components/assignments/submissionDetails";
+
 export interface DashboardCourse {
   image: string;
   courseCode: string;
@@ -21,6 +23,7 @@ export interface User {
   short_name: string;
   pronouns: string;
   id: number;
+  name: string
 }
 
 export interface Unread {
@@ -92,6 +95,7 @@ export interface Assignment {
   external_tool_tag_attributes: {
     url: string;
   };
+  submission: Submission;
 }
 
 export type SubmissionType =
