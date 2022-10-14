@@ -6,7 +6,6 @@ import SequenceButtons from "../../../../components/sequencebuttons";
 import { parseDate } from "../../../../lib/date";
 import { getData } from "../../../../lib/fetch";
 import { Assignment } from "../../../../types/api";
-import { Tabs, TabList, TabPanels, Tab } from "@chakra-ui/react";
 
 import { useRef, useState } from "react";
 

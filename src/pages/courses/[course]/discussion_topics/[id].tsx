@@ -13,6 +13,7 @@ import { Converter } from "showdown";
 import DOMPurify from "isomorphic-dompurify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { queryClient } from "../../../_app";
 
 const converter = new Converter();
 
@@ -100,7 +101,9 @@ function DiscussionSubmissionView(props: {
       props.router.query.id as string,
       text
     );
-  })
+  }, {onSuccess: () => {
+    queryClient.invalidateQueries(["courses", props.router.query.course, "discussions", props.router.query.id, "view"])
+  }})
 
   return (
     <div className="bg-zinc-200 dark:bg-zinc-800 p-4 m-4 rounded border-zinc-300 dark:border-zinc-700 border">

@@ -25,18 +25,16 @@ export default function Sidebar(props: { sidebarWidth: number, setSidebarWidth: 
   const previewView = useDisclosure();
 
   useEffect(() => {
-    if (window.localStorage.getItem("sidebar-width") != null) {
-      let data = parseInt(window.localStorage.getItem("sidebar-width"));
-      setSidebarWidth(data);
-    }
 
     if (
       window.localStorage.getItem("sidebar-open") != null &&
       window.localStorage.getItem("sidebar-open") == "true"
     ) {
       onOpen();
-    } else {
-      setSidebarWidth(0);
+      if (window.localStorage.getItem("sidebar-width") != null) {
+        let data = parseInt(window.localStorage.getItem("sidebar-width"));
+        setSidebarWidth(data);
+      }
     }
   }, [onOpen, setSidebarWidth]);
 
