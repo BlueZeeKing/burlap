@@ -1,4 +1,4 @@
-import { useDisclosure, Heading, Box } from "@chakra-ui/react";
+import { useDisclosure, Heading, Box, Spinner } from "@chakra-ui/react";
 import {
   faChevronDown,
   faChevronUp,
@@ -13,10 +13,10 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { NextRouter, useRouter } from "next/router";
 
-import { getData } from "../../../lib/fetch";
+import { getData, getInfiniteData } from "../../../lib/fetch";
 import { CourseLayout } from "../../../components/layout";
 
 import { Module, Item, Type, Assignment, Discussion, Page } from "../../../types/api";
@@ -24,40 +24,66 @@ import { parseDate } from "../../../lib/date";
 import PrefetchWrapper from "../../../components/prefetcher";
 import { queryClient } from "../../_app";
 import { useBreadcrumb } from "../../../lib/breadcrumb";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function Modules() {
   const router = useRouter()
 
-  const { isSuccess, data } = useQuery(
+  const { data, fetchNextPage, hasNextPage, isSuccess } = useInfiniteQuery(
     ["courses", router.query.course, "modules"],
-    async () => getData<Module[]>(`courses/${router.query.course}/modules`),
+    async ({
+      pageParam = `https://apsva.instructure.com/api/v1/courses/${router.query.course}/modules`,
+    }) => await getInfiniteData<Module[]>(pageParam),
+    {
+      getNextPageParam: (lastPage, pages) => lastPage.nextParams,
+    }
   );
 
   useBreadcrumb([1, "Modules", router.asPath]);
 
   return (
     <CourseLayout isSuccess={isSuccess}>
-      <ModulesView data={data} />
+      <ModulesView data={data.pages.flatMap((item) => item.data)} fetchMore={fetchNextPage} hasMore={hasNextPage} />
     </CourseLayout>
   );
 }
 
-function ModulesView(props: {data: Module[]}) {
+function ModulesView(props: {data: Module[]; fetchMore: () => void; hasMore: boolean}) {
   const router = useRouter();
 
   return (
     <main className="bg p-6 flex flex-col space-y-6">
-      {props.data.map((item) => <Module router={router} key={item.id} module={item}  />)}
+      <InfiniteScroll
+        dataLength={props.data.length}
+        next={props.fetchMore}
+        hasMore={props.hasMore}
+        loader={
+          <div className="grid place-content-center">
+            <Spinner colorScheme="blue" />
+          </div>
+        }
+        className="p-6 flex flex-col space-y-6"
+        endMessage={<p className="text-zinc-500 text-center">End of content</p>}
+      >
+        {props.data.map((item) => (
+          <Module router={router} key={item.id} module={item} />
+        ))}
+      </InfiniteScroll>
     </main>
   );
 }
 
 function Module(props: {module: Module; router: NextRouter}) {
   const { isOpen, onToggle } = useDisclosure()
-  const { isSuccess, data } = useQuery(
+
+  const { data, fetchNextPage, hasNextPage, isSuccess } = useInfiniteQuery(
     ["courses", props.router.query.course, "modules", props.module.id.toString(), "items"],
-    async () => getData<Item[]>(`courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details&per_page=50`),
-    {cacheTime: 15 * 1000}
+    async ({
+      pageParam = `https://apsva.instructure.com/api/v1/courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details`,
+    }) => await getInfiniteData<Item[]>(pageParam),
+    {
+      getNextPageParam: (lastPage, pages) => (lastPage.nextParams),
+    }
   );
 
   return (
@@ -74,22 +100,39 @@ function Module(props: {module: Module; router: NextRouter}) {
       </div>
       {isOpen ? (
         <div className="bg-zinc-100 dark:bg-[#222224] -translate-y-1 z-10 relative pt-1 rounded-b mx-1">
-          {data?.map((item) =>
-            item.type == "SubHeader" ? (
-              <Heading
-                cursor="pointer"
-                p="4"
-                pl={4 + item.indent * 4}
-                key={item.id}
-                as="h2"
-                size="md"
-              >
-                {item.title}
-              </Heading>
-            ) : (
-              <ItemView item={item} router={props.router} key={item.id} />
-            )
-          )}
+          <InfiniteScroll
+            dataLength={data.pages.flatMap((item) => item).length}
+            next={fetchNextPage}
+            hasMore={hasNextPage}
+            loader={
+              <div className="grid place-content-center">
+                <Spinner colorScheme="blue" />
+              </div>
+            }
+            className="p-6 flex flex-col space-y-6"
+            endMessage={
+              <p className="text-zinc-500 text-center">End of content</p>
+            }
+          >
+            {data?.pages
+              .flatMap((item) => item.data)
+              .map((item) =>
+                item.type == "SubHeader" ? (
+                  <Heading
+                    cursor="pointer"
+                    p="4"
+                    pl={4 + item.indent * 4}
+                    key={item.id}
+                    as="h2"
+                    size="md"
+                  >
+                    {item.title}
+                  </Heading>
+                ) : (
+                  <ItemView item={item} router={props.router} key={item.id} />
+                )
+              )}
+          </InfiniteScroll>
         </div>
       ) : (
         ""
@@ -152,7 +195,7 @@ function prefetch(item: Item, courseID: string) {
         ["courses", courseID, "assignments", item.content_id.toString()],
         async () =>
           getData<Assignment>(
-            `courses/${courseID}/assignments/${item.content_id}`
+            `courses/${courseID}/assignments/${item.content_id}?include=submission`
           )
       );
     case "Discussion":

@@ -1,14 +1,15 @@
 import { Avatar, AvatarGroup, IconButton, LinkBox, LinkOverlay, Spinner, useDisclosure } from "@chakra-ui/react";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { dataDir } from "@tauri-apps/api/path";
 import Link from "next/link";
 import { useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import Header from "../../components/header";
 import Loader from "../../components/loader";
 import { parseDate } from "../../lib/date";
-import { getData } from "../../lib/fetch";
+import { getData, getInfiniteData } from "../../lib/fetch";
 import { DashboardCourse, User } from "../../types/api";
 
 interface Conversation {
@@ -20,16 +21,20 @@ interface Conversation {
 }
 
 export default function Messages() {
-  const { data, isSuccess } = useQuery(
+  const { data, fetchNextPage, hasNextPage, isSuccess } = useInfiniteQuery(
     ["messages"],
-    async () =>
-      await getData<Conversation[]>("conversations?include=participant_avatars")
+    async ({
+      pageParam = `https://apsva.instructure.com/api/v1/conversations?include=participant_avatars`,
+    }) => await getInfiniteData<Conversation[]>(pageParam),
+    {
+      getNextPageParam: (lastPage, pages) => lastPage.nextParams,
+    }
   );
 
   const [selectedCourse, setCourse] = useState(0);
   const { onOpen, isOpen, onClose } = useDisclosure();
 
-  console.log(isOpen)
+  console.log(isOpen);
 
   return (
     <div>
@@ -37,18 +42,39 @@ export default function Messages() {
 
       {isSuccess ? (
         <main>
-          {data.map((item) => (
-            <Message
-              data={item}
-              onOpen={() => {
-                console.log(item);
-                setCourse(item.id);
-                onOpen();
-              }}
-              key={item.id}
-            />
-          ))}
-          {isOpen ? <MessageView onClose={onClose} id={selectedCourse} /> : ""}
+          <InfiniteScroll
+            dataLength={data.pages.flatMap((item) => item.data).length}
+            next={fetchNextPage}
+            hasMore={hasNextPage}
+            loader={
+              <div className="grid place-content-center">
+                <Spinner colorScheme="blue" />
+              </div>
+            }
+            className="p-6 flex flex-col space-y-6"
+            endMessage={
+              <p className="text-zinc-500 text-center">End of content</p>
+            }
+          >
+            {data.pages
+              .flatMap((item) => item.data)
+              .map((item) => (
+                <Message
+                  data={item}
+                  onOpen={() => {
+                    console.log(item);
+                    setCourse(item.id);
+                    onOpen();
+                  }}
+                  key={item.id}
+                />
+              ))}
+            {isOpen ? (
+              <MessageView onClose={onClose} id={selectedCourse} />
+            ) : (
+              ""
+            )}
+          </InfiniteScroll>
         </main>
       ) : (
         <Loader />

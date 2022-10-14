@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { NextRouter, useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
-import { getData } from "../lib/fetch";
+import { getData, getInfiniteData } from "../lib/fetch";
 import { queryClient } from "../pages/_app";
 import { Tab, Module, Assignment, Announcement, Discussion } from "../types/api";
 import PrefetchWrapper from "./prefetcher";
@@ -146,11 +146,26 @@ function getURL(data: Tab, courseId: string) {
 const getPrefetch = (router: NextRouter, tab: Tab) => {
   switch (tab.id) {
     case "modules":
-      queryClient.prefetchQuery(["courses", router.query.course, "modules"], async () => getData<Module[]>(`courses/${router.query.course}/modules?include=items`)); break;
+      queryClient.prefetchQuery(
+        ["courses", router.query.course, "modules"],
+        async ({
+          pageParam = `https://apsva.instructure.com/api/v1/courses/${router.query.course}/modules`,
+        }) => await getInfiniteData<Module[]>(pageParam)
+      ); break;
     case "announcements":
-      queryClient.prefetchQuery(["courses", router.query.course, "announcements"], async () => getData<Announcement[]>(`courses/${router.query.course}/discussion_topics?only_announcements=true`)); break;
+      queryClient.prefetchInfiniteQuery(
+        ["courses", router.query.course, "announcements"],
+        async ({
+          pageParam = `https://apsva.instructure.com/api/v1/courses/${router.query.course}/discussion_topics?only_announcements=true`,
+        }) => await getInfiniteData<Announcement[]>(pageParam)
+      ); break;
     case "assignments":
-      queryClient.prefetchQuery(["courses", router.query.course, "assignments"], async () => getData<Assignment[]>(`courses/${router.query.course}/assignments`)); break;
+      queryClient.prefetchInfiniteQuery(
+        ["courses", router.query.course, "assignments"],
+        async ({
+          pageParam = `https://apsva.instructure.com/api/v1/courses/${router.query.course}/assignments`,
+        }) => await getInfiniteData<Assignment[]>(pageParam)
+      ); break;
     case "discussion_topics":
       queryClient.prefetchQuery(["courses", router.query.course, "discussions"], async () => getData<Discussion[]>(`courses/${router.query.course}/discussion_topics`)); break;
   }

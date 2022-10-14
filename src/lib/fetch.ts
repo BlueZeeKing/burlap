@@ -3,6 +3,8 @@ import jsFetch from "./fetchWrapper"
 
 import { getKey } from "./auth";
 
+const regexNextPage = /.*<(.+?)>; rel="next".*/
+
 export async function getData<T>(url: string) {
   const key = await getKey()
   const body = await fetch(`https://apsva.instructure.com/api/v1/${url}`, {
@@ -15,6 +17,24 @@ export async function getData<T>(url: string) {
   if (!body.ok) throw body.status
 
   return body.data as T
+}
+
+export async function getInfiniteData<T>(params: string): Promise<{data: T; nextParams: string | undefined}> {
+  console.log(params)
+  const key = await getKey();
+  const body = await fetch(params, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${key}`,
+    },
+  });
+
+  if (!body.ok) throw body.status;
+
+  return {
+    data: body.data as T,
+    nextParams: regexNextPage.test(body.headers["link"]) ? body.headers["link"].match(regexNextPage)[1] : undefined,
+  };
 }
 
 export async function submitAssignment<T>(course: string, assignment: string, query: Record<string, any>) {
