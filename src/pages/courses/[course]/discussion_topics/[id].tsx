@@ -35,6 +35,7 @@ interface DiscussionEntry {
   user_id: number;
   message: string;
   created_at: string;
+  deleted: boolean;
 }
 
 export default function DiscussionPage() {
@@ -48,7 +49,7 @@ export default function DiscussionPage() {
       )
   );
 
-  const discussionView = useQuery(
+  const discussionView = useQuery( // TODO: Infinite query
     ["courses", router.query.course, "discussions", router.query.id, "view"],
     async () =>
       getData<DiscussionView>(
@@ -82,7 +83,7 @@ function DiscussionView(props: { data: Discussion; viewData: DiscussionView; vie
         html={data.message}
       />
       {data.locked ? "" : <DiscussionSubmissionView router={router} />}
-      {viewDataReady ? viewData.view.map((item) => <DiscussionEntryView entry={item} author={viewData.participants.find((user) => user.id == item.user_id)} router={router} key={item.id} />) : ""}
+      {viewDataReady ? viewData.view.filter((item) => !item.deleted).map((item) => <DiscussionEntryView entry={item} author={viewData.participants.find((user) => user.id == item.user_id)} router={router} key={item.id} />) : ""}
       <SequenceButtons />
     </div>
   );
