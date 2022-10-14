@@ -43,7 +43,7 @@ export default function Modules() {
 
   return (
     <CourseLayout isSuccess={isSuccess}>
-      <ModulesView data={data.pages.flatMap((item) => item.data)} fetchMore={fetchNextPage} hasMore={hasNextPage} />
+      <ModulesView data={data?.pages.flatMap((item) => item.data)} fetchMore={fetchNextPage} hasMore={hasNextPage} />
     </CourseLayout>
   );
 }
@@ -52,7 +52,7 @@ function ModulesView(props: {data: Module[]; fetchMore: () => void; hasMore: boo
   const router = useRouter();
 
   return (
-    <main className="bg p-6 flex flex-col space-y-6">
+    <main className="bg">
       <InfiniteScroll
         dataLength={props.data.length}
         next={props.fetchMore}
@@ -101,7 +101,7 @@ function Module(props: {module: Module; router: NextRouter}) {
       {isOpen ? (
         <div className="bg-zinc-100 dark:bg-[#222224] -translate-y-1 z-10 relative pt-1 rounded-b mx-1">
           <InfiniteScroll
-            dataLength={data.pages.flatMap((item) => item).length}
+            dataLength={data?.pages?.flatMap((item) => item).length}
             next={fetchNextPage}
             hasMore={hasNextPage}
             loader={

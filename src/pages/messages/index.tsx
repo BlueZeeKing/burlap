@@ -43,7 +43,7 @@ export default function Messages() {
       {isSuccess ? (
         <main>
           <InfiniteScroll
-            dataLength={data.pages.flatMap((item) => item.data).length}
+            dataLength={data?.pages.flatMap((item) => item.data).length}
             next={fetchNextPage}
             hasMore={hasNextPage}
             loader={
@@ -56,7 +56,7 @@ export default function Messages() {
               <p className="text-zinc-500 text-center">End of content</p>
             }
           >
-            {data.pages
+            {data?.pages
               .flatMap((item) => item.data)
               .map((item) => (
                 <Message
