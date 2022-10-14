@@ -103,6 +103,7 @@ function DiscussionSubmissionView(props: {
     );
   }, {onSuccess: () => {
     queryClient.invalidateQueries(["courses", props.router.query.course, "discussions", props.router.query.id, "view"])
+    setText("")
   }})
 
   return (
