@@ -1,15 +1,15 @@
-import "../global.css";
+import '../global.css'
 
-import { ChakraProvider, createStandaloneToast } from "@chakra-ui/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ChakraProvider, createStandaloneToast } from '@chakra-ui/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
-import { useEffect } from "react";
-import { useRouter } from "next/router";
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
-import { loggedIn } from "../lib/auth";
+import { loggedIn } from '../lib/auth'
 
-const { ToastContainer, toast } = createStandaloneToast();
+const { ToastContainer, toast } = createStandaloneToast()
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,30 +18,30 @@ export const queryClient = new QueryClient({
       cacheTime: 180 * 1000,
       onError: (error: string) => {
         toast({
-          title: "An error occurred.",
+          title: 'An error occurred.',
           description: error,
-          status: "error",
+          status: 'error',
           duration: 9000,
           isClosable: true,
-          position: "top-right",
-        });
-      }
+          position: 'top-right',
+        })
+      },
     },
   },
-});
+})
 
 export default function MyApp({ Component, pageProps }) {
-  const nav = useRouter();
+  const nav = useRouter()
 
   useEffect(() => {
     const func = async () => {
-      if (!(await loggedIn()) && nav.pathname != "/start") {
-        nav.push("/start");
+      if (!(await loggedIn()) && nav.pathname != '/start') {
+        nav.push('/start')
       }
-    };
+    }
 
-    func();
-  });
+    func()
+  })
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -51,5 +51,5 @@ export default function MyApp({ Component, pageProps }) {
         <Component {...pageProps} />
       </ChakraProvider>
     </QueryClientProvider>
-  );
+  )
 }

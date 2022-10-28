@@ -115,6 +115,7 @@ function MessageView(props: { id: number; onClose: () => void }) {
         }[];
       }>(`conversations/${props.id}`)
   );
+  
 
   if (isSuccess) {
     return (

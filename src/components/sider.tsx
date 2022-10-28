@@ -1,65 +1,64 @@
-import { Button, IconButton, useDisclosure } from "@chakra-ui/react";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
-import { NextRouter, useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
-import { getData, getInfiniteData } from "../lib/fetch";
-import { queryClient } from "../pages/_app";
-import { Tab, Module, Assignment, Announcement, Discussion } from "../types/api";
-import PrefetchWrapper from "./prefetcher";
-import Resizer from "./resizer";
+import { Button, IconButton, useDisclosure } from '@chakra-ui/react'
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useQuery } from '@tanstack/react-query'
+import Link from 'next/link'
+import { NextRouter, useRouter } from 'next/router'
+import { ReactNode, useEffect, useState } from 'react'
+import { getData, getInfiniteData } from '../lib/fetch'
+import { queryClient } from '../pages/_app'
+import { Tab, Module, Assignment, Announcement, Discussion } from '../types/api'
+import PrefetchWrapper from './prefetcher'
+import Resizer from './resizer'
 
-export default function Sidebar(props: { sidebarWidth: number, setSidebarWidth: (a: number) => void }) {
-  const { sidebarWidth, setSidebarWidth } = props;
+export default function Sidebar(props: {
+  sidebarWidth: number
+  setSidebarWidth: (a: number) => void
+}) {
+  const { sidebarWidth, setSidebarWidth } = props
 
-  const router = useRouter();
+  const router = useRouter()
 
   const { data, isSuccess } = useQuery(
-    ["courses", router.query.course, "tabs"],
+    ['courses', router.query.course, 'tabs'],
     async () => await getData<Tab[]>(`courses/${router.query.course}/tabs`)
-  );
+  )
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const previewView = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const previewView = useDisclosure()
 
   useEffect(() => {
-
     if (
-      window.localStorage.getItem("sidebar-open") != null &&
-      window.localStorage.getItem("sidebar-open") == "true"
+      window.localStorage.getItem('sidebar-open') != null &&
+      window.localStorage.getItem('sidebar-open') == 'true'
     ) {
-      onOpen();
-      if (window.localStorage.getItem("sidebar-width") != null) {
-        let data = parseInt(window.localStorage.getItem("sidebar-width"));
-        setSidebarWidth(data);
+      onOpen()
+      if (window.localStorage.getItem('sidebar-width') != null) {
+        let data = parseInt(window.localStorage.getItem('sidebar-width'))
+        setSidebarWidth(data)
       }
     }
-  }, [onOpen, setSidebarWidth]);
+  }, [onOpen, setSidebarWidth])
 
   useEffect(() => {
-    window.localStorage.setItem("sidebar-open", isOpen.toString());
-  }, [isOpen]);
+    window.localStorage.setItem('sidebar-open', isOpen.toString())
+  }, [isOpen])
 
   return (
-    <div className="grid col-span-1 row-span-1" style={{ gridArea: "sider" }}>
+    <div className="grid col-span-1 row-span-1" style={{ gridArea: 'sider' }}>
       {isOpen ? (
         <SiderInterior
           data={data}
           sidebarWidth={sidebarWidth}
           router={router}
           isResizable={true}
-          handleWidth={(width) => {
+          handleWidth={width => {
             if (width < 80) {
-              onClose();
-              setSidebarWidth(0);
+              onClose()
+              setSidebarWidth(0)
             } else {
-              setSidebarWidth(width);
-              window.localStorage.setItem(
-                "sidebar-width",
-                width.toString()
-              );
+              setSidebarWidth(width)
+              window.localStorage.setItem('sidebar-width', width.toString())
             }
           }}
         />
@@ -72,8 +71,8 @@ export default function Sidebar(props: { sidebarWidth: number, setSidebarWidth: 
           <div className="fixed bottom-0 left-0 p-3 z-50">
             <IconButton
               onClick={() => {
-                setSidebarWidth(200);
-                onOpen();
+                setSidebarWidth(200)
+                onOpen()
               }}
               aria-label="Open sidebar"
             >
@@ -93,33 +92,44 @@ export default function Sidebar(props: { sidebarWidth: number, setSidebarWidth: 
               />
             </div>
           ) : (
-            ""
+            ''
           )}
         </>
       )}
     </div>
-  );
+  )
 }
 
-function SiderInterior(props: { sidebarWidth: number; router: NextRouter; data: Tab[]; isResizable: boolean; className?: string; onExit?: () => void; handleWidth: (a: number) => void }) {
-  const {sidebarWidth, router, handleWidth, data, isResizable, className, onExit} = props
+function SiderInterior(props: {
+  sidebarWidth: number
+  router: NextRouter
+  data: Tab[]
+  isResizable: boolean
+  className?: string
+  onExit?: () => void
+  handleWidth: (a: number) => void
+}) {
+  const { sidebarWidth, router, handleWidth, data, isResizable, className, onExit } = props
 
   return (
     <aside
-      className={"bg-zinc-100 dark:bg-zinc-700 relative select-none overflow-x-hidden " + (className ? className : "")}
+      className={
+        'bg-zinc-100 dark:bg-zinc-700 relative select-none overflow-x-hidden ' +
+        (className ? className : '')
+      }
       style={{ width: sidebarWidth, flexBasis: sidebarWidth }}
       onMouseLeave={onExit}
     >
       {data
-        ?.sort((item) => item.position)
-        .map((item) => (
+        ?.sort(item => item.position)
+        .map(item => (
           <PrefetchWrapper prefetch={() => getPrefetch(router, item)} key={item.id}>
             <Link href={getURL(item, router.query.course as string)}>
               <p
                 className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg whitespace-nowrap overflow-x-hidden ${
                   router.asPath == getURL(item, router.query.course as string)
-                    ? "bg-sky-400 !bg-opacity-30"
-                    : ""
+                    ? 'bg-sky-400 !bg-opacity-30'
+                    : ''
                 }`}
               >
                 {item.label}
@@ -127,46 +137,52 @@ function SiderInterior(props: { sidebarWidth: number; router: NextRouter; data: 
             </Link>
           </PrefetchWrapper>
         ))}
-      { isResizable ? 
-      <Resizer width={sidebarWidth} setWidth={handleWidth}  /> : "" }
+      {isResizable ? <Resizer width={sidebarWidth} setWidth={handleWidth} /> : ''}
     </aside>
-  );
+  )
 }
 
 function getURL(data: Tab, courseId: string) {
-  if (data.type == "internal") {
+  if (data.type == 'internal') {
     switch (data.id) {
-      default: return data.html_url
+      default:
+        return data.html_url
     }
   } else {
-    return "/404"
+    return '/404'
   }
 }
 
 const getPrefetch = (router: NextRouter, tab: Tab) => {
   switch (tab.id) {
-    case "modules":
-      queryClient.prefetchQuery(
-        ["courses", router.query.course, "modules"],
+    case 'modules':
+      queryClient.prefetchInfiniteQuery(
+        ['courses', router.query.course, 'modules'],
         async ({
           pageParam = `https://apsva.instructure.com/api/v1/courses/${router.query.course}/modules`,
         }) => await getInfiniteData<Module[]>(pageParam)
-      ); break;
-    case "announcements":
+      )
+      break
+    case 'announcements':
       queryClient.prefetchInfiniteQuery(
-        ["courses", router.query.course, "announcements"],
+        ['courses', router.query.course, 'announcements'],
         async ({
           pageParam = `https://apsva.instructure.com/api/v1/courses/${router.query.course}/discussion_topics?only_announcements=true`,
         }) => await getInfiniteData<Announcement[]>(pageParam)
-      ); break;
-    case "assignments":
+      )
+      break
+    case 'assignments':
       queryClient.prefetchInfiniteQuery(
-        ["courses", router.query.course, "assignments"],
+        ['courses', router.query.course, 'assignments'],
         async ({
           pageParam = `https://apsva.instructure.com/api/v1/courses/${router.query.course}/assignments`,
         }) => await getInfiniteData<Assignment[]>(pageParam)
-      ); break;
-    case "discussion_topics":
-      queryClient.prefetchQuery(["courses", router.query.course, "discussions"], async () => getData<Discussion[]>(`courses/${router.query.course}/discussion_topics`)); break;
+      )
+      break
+    case 'discussion_topics':
+      queryClient.prefetchQuery(['courses', router.query.course, 'discussions'], async () =>
+        getData<Discussion[]>(`courses/${router.query.course}/discussion_topics`)
+      )
+      break
   }
-};
+}

@@ -111,7 +111,7 @@ function TextTab(props: { course: string; assignment: string }) {
   });
 
   return (
-    <TabPanel>
+    <TabPanel display="flex" flexDir="column">
       <div className="pb-4">
         <button
           onClick={() => setShowPreview(false)}
@@ -138,22 +138,24 @@ function TextTab(props: { course: string; assignment: string }) {
           }}
         />
       ) : (
-        <Textarea value={text} onChange={(e) => setText(e.target.value)} />
+        <Textarea value={text} onChange={(e) => setText(e.target.value)} resize="none" flexGrow="1" />
       )}
-      <Button
-        colorScheme="blue"
-        leftIcon={
-          submit.isLoading ? (
-            <Spinner />
-          ) : (
-            <FontAwesomeIcon icon={submit.isSuccess ? faCheck : faPaperPlane} />
-          )
-        }
-        onClick={() => submit.mutate(text)}
-        my="4"
-      >
-        Submit
-      </Button>
+      <div>
+        <Button
+          colorScheme="blue"
+          leftIcon={
+            submit.isLoading ? (
+              <Spinner />
+            ) : (
+              <FontAwesomeIcon icon={submit.isSuccess ? faCheck : faPaperPlane} />
+            )
+          }
+          onClick={() => submit.mutate(text)}
+          my="4"
+        >
+          Submit
+        </Button>
+      </div>
     </TabPanel>
   );
 }

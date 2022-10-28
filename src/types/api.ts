@@ -6,6 +6,7 @@ export interface DashboardCourse {
   shortName: string;
   id: number;
   defaultView: DefaultView;
+  assetString: string;
 }
 
 export interface Course {

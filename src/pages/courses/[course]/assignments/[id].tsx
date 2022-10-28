@@ -1,42 +1,44 @@
-import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/router";
-import { CourseLayout } from "../../../../components/layout";
-import Sanitizer from "../../../../components/sanitize";
-import SequenceButtons from "../../../../components/sequencebuttons";
-import { parseDate } from "../../../../lib/date";
-import { getData } from "../../../../lib/fetch";
-import { Assignment } from "../../../../types/api";
+import { useQuery } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
+import { CourseLayout } from '../../../../components/layout'
+import Sanitizer from '../../../../components/sanitize'
+import SequenceButtons from '../../../../components/sequencebuttons'
+import { parseDate } from '../../../../lib/date'
+import { getData } from '../../../../lib/fetch'
+import { Assignment } from '../../../../types/api'
 
-import { useRef, useState } from "react";
+import { useRef, useState } from 'react'
 
-import { useBreadcrumb } from "../../../../lib/breadcrumb";
-import Resizer from "../../../../components/resizer";
-import Submitter from "../../../../components/assignments/submission";
-import SubmissionDetail from "../../../../components/assignments/submissionDetails";
+import { useBreadcrumb } from '../../../../lib/breadcrumb'
+import Resizer from '../../../../components/resizer'
+import Submitter from '../../../../components/assignments/submission'
+import SubmissionDetail from '../../../../components/assignments/submissionDetails'
 
 export default function AssignmentPage() {
-  const router = useRouter();
+  const router = useRouter()
 
   const { isSuccess, data } = useQuery(
-    ["courses", router.query.course, "assignments", router.query.id],
+    ['courses', router.query.course, 'assignments', router.query.id],
     async () =>
-      getData<Assignment>(`courses/${router.query.course}/assignments/${router.query.id}?include=submission`)
-  );
+      getData<Assignment>(
+        `courses/${router.query.course}/assignments/${router.query.id}?include=submission`
+      )
+  )
 
   return (
     <CourseLayout isSuccess={isSuccess}>
       <AssignmentView data={data} />
     </CourseLayout>
-  );
+  )
 }
 
 function AssignmentView(props: { data: Assignment }) {
   const { data } = props
   const router = useRouter()
   const [width, setWidth] = useState(700)
-  const [height, setHeight] = useState(500);
+  const [height, setHeight] = useState(500)
 
-  useBreadcrumb([2, data.name, router.asPath]);
+  useBreadcrumb([2, data.name, router.asPath])
 
   const ref = useRef<HTMLDivElement>()
 
@@ -71,5 +73,5 @@ function AssignmentView(props: { data: Assignment }) {
       </div>
       <SequenceButtons />
     </div>
-  );
+  )
 }
