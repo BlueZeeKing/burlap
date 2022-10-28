@@ -11,7 +11,7 @@ import PrefetchWrapper from "../components/prefetcher";
 import { Box, LinkBox, LinkOverlay } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGripHorizontal, faGripVertical } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useRef, useState } from "react";
+import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion"
 
 const MotionLinkBox = motion(LinkBox)
@@ -33,64 +33,31 @@ interface MovingCourseData {
   x: number,
   y: number,
   width: number,
-  height: number
+  height: number,
+  offsetX: number,
+  offsetY: number
 }
-
-type MoveFuncs = [ // up down left right
-  (id: number) => void,
-  (id: number) => void,
-  (id: number) => void,
-  (id: number) => void
-];
 
 function AppView(props: { data: DashboardCourse[] }) {
   const [movingCourse, setMovingCourse] = useState<MovingCourseData | undefined>();
   const ref = useRef<HTMLDivElement>(null)
   const [order, setOrder] = useState<number[]>(props.data.map((item) => item.id))
 
-  const moveUp = (id: number) => {
-    const colSize =  getComputedStyle(ref.current).getPropertyValue("grid-template-columns").replaceAll("px", "").split(" ").length
-    let orderCopy: number[] = JSON.parse(JSON.stringify(order))
-    const index = orderCopy.indexOf(id)
-    orderCopy[index] = orderCopy[index-colSize]
-    orderCopy[index - colSize] = id;
-    setOrder(orderCopy)
+  const move = (index: number, id: number) => {
+    let copy: number[] = JSON.parse(JSON.stringify(order))
+
+    copy.splice(copy.indexOf(id), 1)
+    copy.splice(index, 0, id)
+
+    setOrder(copy)
   }
-
-  const moveDown = (id: number) => {
-    const colSize = getComputedStyle(ref.current)
-      .getPropertyValue("grid-template-columns")
-      .replaceAll("px", "")
-      .split(" ").length;
-    let orderCopy: number[] = JSON.parse(JSON.stringify(order));
-    const index = orderCopy.indexOf(id);
-    orderCopy[index] = orderCopy[index + colSize];
-    orderCopy[index + colSize] = id;
-    setOrder(orderCopy);
-  };
-
-  const moveRight = (id: number) => {
-    let orderCopy: number[] = JSON.parse(JSON.stringify(order));
-    const index = orderCopy.indexOf(id);
-    orderCopy[index] = orderCopy[index + 1];
-    orderCopy[index + 1] = id;
-    setOrder(orderCopy);
-  };
-
-  const moveLeft = (id: number) => {
-    let orderCopy: number[] = JSON.parse(JSON.stringify(order));
-    const index = orderCopy.indexOf(id);
-    orderCopy[index] = orderCopy[index - 1];
-    orderCopy[index - 1] = id;
-    setOrder(orderCopy);
-  };
   
   return (
     <main className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 bg gap-6 p-6 w-screen" ref={ref}>
       {props.data.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)).map((item) => (
         <CourseItem key={item.id} item={item} setMovingCourse={setMovingCourse} clicked={item.id == movingCourse?.id} />
       ))}
-      {movingCourse ? <MovingCourseItem setMovingCourse={setMovingCourse} item={props.data.find((item) => item.id == movingCourse.id)} data={movingCourse} func={[moveUp, moveDown, moveLeft, moveRight]} /> : ""}
+      {movingCourse ? <MovingCourseItem gridRef={ref} setMovingCourse={setMovingCourse} item={props.data.find((item) => item.id == movingCourse.id)} data={movingCourse} func={move} /> : ""}
     </main>
   );
 }
@@ -118,6 +85,8 @@ function CourseItem(props: {item: DashboardCourse; setMovingCourse: (a: MovingCo
                 y: top,
                 width: width,
                 height: height,
+                offsetX: e.clientX - left,
+                offsetY: e.clientY - top
               });
               pauseEvent(e);
             }}
@@ -151,35 +120,72 @@ function CourseItem(props: {item: DashboardCourse; setMovingCourse: (a: MovingCo
   );
 }
 
-function MovingCourseItem(props: {item: DashboardCourse; data: MovingCourseData; setMovingCourse: (a: undefined) => void; func: MoveFuncs}) {
-  const [pos, setPos] = useState<[number, number]>([props.data.x, props.data.y])
-  const [complete, setComplete] = useState(false)
+const formatTemplateList = (a: string) => {
+  return a
+    .replaceAll("px", "")
+    .split(" ")
+    .map((i) => parseInt(i));
+}
+
+function MovingCourseItem(props: {
+  item: DashboardCourse;
+  data: MovingCourseData;
+  setMovingCourse: (a: undefined) => void;
+  func: (index: number, id: number) => void;
+  gridRef: MutableRefObject<HTMLDivElement>;
+}) {
+  const [pos, setPos] = useState<[number, number]>([
+    props.data.x,
+    props.data.y,
+  ]);
+  const getRowsColumns = useCallback(() => {
+    let compStyle = getComputedStyle(props.gridRef.current);
+    //console.log("compute")
+    return [
+      formatTemplateList(compStyle.getPropertyValue("grid-template-rows")),
+      formatTemplateList(compStyle.getPropertyValue("grid-template-columns")),
+    ];
+  }, [props.gridRef])
+
   useEffect(() => {
     const mouseMoveHandler = (e) => {
       pauseEvent(e);
-      let newPos: [number, number] = [pos[0] + e.movementX, pos[1] + e.movementY];
-      if (Math.abs(newPos[0] - props.data.x) > props.data.width && !complete) {
-        if (newPos[0] - props.data.x > 0) props.func[3](props.item.id);
-        else props.func[2](props.item.id);
-        setComplete(true)
-      } else if (Math.abs(newPos[1] - props.data.y) > props.data.height && !complete) {
-        if (newPos[1] - props.data.y > 0) props.func[1](props.item.id);
-        else props.func[0](props.item.id);
-        setComplete(true)
+      let newPos: [number, number] = [
+        e.clientX - props.data.offsetX,
+        e.clientY - props.data.offsetY,
+      ];
+      if (e.movementX ** e.movementX + e.movementY ** e.movementY <= 2) {
+        const { top, left } = props.gridRef.current.getBoundingClientRect();
+        const [rows, columns] = getRowsColumns();
+        props.func((rows.findIndex((value, index) => value * index > newPos[1] - top) - 1) * columns.length + (columns.findIndex((value, index) => value * index > newPos[0] - left) - 1), props.data.id)
       }
       setPos(newPos)
     };
 
-    window.addEventListener("mousemove", mouseMoveHandler);
+    const mouseUpHandler = () => {
+      props.setMovingCourse(undefined);
+    };
 
-    return () => window.removeEventListener("mousemove", mouseMoveHandler);
-  })
+    window.addEventListener("mousemove", mouseMoveHandler);
+    window.addEventListener("mouseup", mouseUpHandler)
+
+    return () => {
+      window.removeEventListener("mousemove", mouseMoveHandler);
+      window.removeEventListener("mouseup", mouseUpHandler);
+    }
+  });
 
   return (
-    <div style={{top: pos[1], left: pos[0], width: props.data.width, height: props.data.height}} className="p-8 bg-white dark:bg-zinc-800 rounded border-zinc-300 dark:border-zinc-700 border cursor-pointer fixed set-opacity-wrapper" onMouseUp={() => props.setMovingCourse(undefined)}>
-      <div
-        className="set-opacity absolute z-50 left-3 top-[50%] -translate-y-[50%] opacity-0 transition-opacity cursor-grabbing"
-      >
+    <div
+      style={{
+        top: pos[1],
+        left: pos[0],
+        width: props.data.width,
+        height: props.data.height,
+      }}
+      className="p-8 bg-white dark:bg-zinc-800 rounded border-zinc-300 dark:border-zinc-700 border cursor-pointer fixed set-opacity-wrapper"
+    >
+      <div className="set-opacity absolute z-50 left-3 top-[50%] -translate-y-[50%] opacity-0 transition-opacity cursor-grabbing">
         <FontAwesomeIcon icon={faGripVertical} className="text-zinc-600" />
       </div>
       <h2 className="text-xl flex flex-row">{props.item.shortName}</h2>
