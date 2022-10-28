@@ -15,7 +15,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import { useBreadcrumb } from '../../../../lib/breadcrumb'
 import { useToast } from '@chakra-ui/react'
-import { open } from '@tauri-apps/api/shell'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`
 

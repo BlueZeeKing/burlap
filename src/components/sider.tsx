@@ -1,10 +1,10 @@
-import { Button, IconButton, useDisclosure } from '@chakra-ui/react'
+import { IconButton, useDisclosure } from '@chakra-ui/react'
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { NextRouter, useRouter } from 'next/router'
-import { ReactNode, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { getData, getInfiniteData } from '../lib/fetch'
 import { queryClient } from '../pages/_app'
 import { Tab, Module, Assignment, Announcement, Discussion } from '../types/api'
@@ -13,13 +13,14 @@ import Resizer from './resizer'
 
 export default function Sidebar(props: {
   sidebarWidth: number
+  // eslint-disable-next-line unused-imports/no-unused-vars
   setSidebarWidth: (a: number) => void
 }) {
   const { sidebarWidth, setSidebarWidth } = props
 
   const router = useRouter()
 
-  const { data, isSuccess } = useQuery(
+  const { data } = useQuery(
     ['courses', router.query.course, 'tabs'],
     async () => await getData<Tab[]>(`courses/${router.query.course}/tabs`)
   )
@@ -107,6 +108,7 @@ function SiderInterior(props: {
   isResizable: boolean
   className?: string
   onExit?: () => void
+  // eslint-disable-next-line unused-imports/no-unused-vars
   handleWidth: (a: number) => void
 }) {
   const { sidebarWidth, router, handleWidth, data, isResizable, className, onExit } = props
@@ -124,12 +126,10 @@ function SiderInterior(props: {
         ?.sort(item => item.position)
         .map(item => (
           <PrefetchWrapper prefetch={() => getPrefetch(router, item)} key={item.id}>
-            <Link href={getURL(item, router.query.course as string)}>
+            <Link href={getURL(item)}>
               <p
                 className={`pl-4 py-2 m-2 hover:bg-sky-400 hover:bg-opacity-[0.15] cursor-pointer rounded-lg whitespace-nowrap overflow-x-hidden ${
-                  router.asPath == getURL(item, router.query.course as string)
-                    ? 'bg-sky-400 !bg-opacity-30'
-                    : ''
+                  router.asPath == getURL(item) ? 'bg-sky-400 !bg-opacity-30' : ''
                 }`}
               >
                 {item.label}
@@ -142,7 +142,7 @@ function SiderInterior(props: {
   )
 }
 
-function getURL(data: Tab, courseId: string) {
+function getURL(data: Tab) {
   if (data.type == 'internal') {
     switch (data.id) {
       default:

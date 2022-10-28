@@ -7,7 +7,6 @@ import Wiki from './home'
 import Syllabus from './syllabus'
 import Modules from './modules'
 import { CourseLayout } from '../../../components/layout'
-import { useEffect } from 'react'
 import { setBreadcrumb } from '../../../lib/breadcrumb'
 
 export default function Home() {

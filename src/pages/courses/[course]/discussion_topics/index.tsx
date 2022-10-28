@@ -1,11 +1,11 @@
 import { Spinner } from '@chakra-ui/react'
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { CourseLayout } from '../../../../components/layout'
 import { useBreadcrumb } from '../../../../lib/breadcrumb'
-import { getData, getInfiniteData } from '../../../../lib/fetch'
+import { getInfiniteData } from '../../../../lib/fetch'
 import { Discussion } from '../../../../types/api'
 
 export default function DiscussionList() {
@@ -17,7 +17,7 @@ export default function DiscussionList() {
       pageParam = `https://apsva.instructure.com/api/v1/courses/${router.query.course}/discussion_topics`,
     }) => await getInfiniteData<Discussion[]>(pageParam),
     {
-      getNextPageParam: (lastPage, pages) => lastPage.nextParams,
+      getNextPageParam: (lastPage, _pages) => lastPage.nextParams,
     }
   )
 

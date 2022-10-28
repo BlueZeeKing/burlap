@@ -13,7 +13,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
 
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { NextRouter, useRouter } from 'next/router'
 
 import { getData, getInfiniteData } from '../../../lib/fetch'
@@ -35,7 +35,7 @@ export default function Modules() {
       pageParam = `https://apsva.instructure.com/api/v1/courses/${router.query.course}/modules`,
     }) => await getInfiniteData<Module[]>(pageParam),
     {
-      getNextPageParam: (lastPage, pages) => lastPage.nextParams,
+      getNextPageParam: (lastPage, _pages) => lastPage.nextParams,
     }
   )
 
@@ -80,13 +80,13 @@ function ModulesView(props: { data: Module[]; fetchMore: () => void; hasMore: bo
 function Module(props: { module: Module; router: NextRouter }) {
   const { isOpen, onToggle } = useDisclosure()
 
-  const { data, fetchNextPage, hasNextPage, isSuccess } = useInfiniteQuery(
+  const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(
     ['courses', props.router.query.course, 'modules', props.module.id.toString(), 'items'],
     async ({
       pageParam = `https://apsva.instructure.com/api/v1/courses/${props.router.query.course}/modules/${props.module.id}/items?include=content_details`,
     }) => await getInfiniteData<Item[]>(pageParam),
     {
-      getNextPageParam: (lastPage, pages) => lastPage.nextParams,
+      getNextPageParam: (lastPage, _pages) => lastPage.nextParams,
     }
   )
 

@@ -2,6 +2,7 @@ import { MutableRefObject, useEffect, useState } from 'react'
 
 export default function Resizer(props: {
   width: number
+  // eslint-disable-next-line unused-imports/no-unused-vars
   setWidth: (a: number) => void
   horizontal?: boolean
   parentRef?: MutableRefObject<HTMLDivElement>

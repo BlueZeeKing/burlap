@@ -119,6 +119,7 @@ function AppView(props: { data: DashboardCourse[] }) {
 
 function CourseItem(props: {
   item: DashboardCourse
+  // eslint-disable-next-line unused-imports/no-unused-vars
   setMovingCourse: (a: MovingCourseData) => void
   clicked: boolean
 }) {
@@ -184,7 +185,9 @@ const formatTemplateList = (a: string) => {
 function MovingCourseItem(props: {
   item: DashboardCourse
   data: MovingCourseData
+  // eslint-disable-next-line unused-imports/no-unused-vars
   setMovingCourse: (a: undefined) => void
+  // eslint-disable-next-line unused-imports/no-unused-vars
   update: (index: number, id: string) => void
   onComplete: () => void
   gridRef: MutableRefObject<HTMLDivElement>
