@@ -113,8 +113,7 @@ function Module(props: { module: Module; router: NextRouter }) {
                 <Spinner colorScheme="blue" />
               </div>
             }
-            className="p-6 flex flex-col space-y-6"
-            endMessage={<p className="text-zinc-500 text-center">End of content</p>}
+            className="flex flex-col"
           >
             {data?.pages
               .flatMap(item => item.data)

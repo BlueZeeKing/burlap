@@ -44,6 +44,9 @@ export function clean(html: string, ref: MutableRefObject<HTMLDivElement>, route
         case 'Module':
           a.href = url.pathname.split('/').slice(0, 4).join('/')
           break
+        case 'File':
+          a.href = url.pathname.replace('/download', '')
+          break
         default:
           a.href = url.pathname
           break
