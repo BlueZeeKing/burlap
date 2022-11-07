@@ -22,7 +22,7 @@ import { CourseLayout } from '../../../components/layout'
 import { Module, Item, Type, Assignment, Discussion, Page } from '../../../types/api'
 import { parseDate } from '../../../lib/date'
 import PrefetchWrapper from '../../../components/prefetcher'
-import { queryClient } from '../../_app'
+import { queryClient } from '../../app'
 import { useBreadcrumb } from '../../../lib/breadcrumb'
 import InfiniteScroll from 'react-infinite-scroll-component'
 

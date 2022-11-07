@@ -13,7 +13,7 @@ import { Converter } from 'showdown'
 import DOMPurify from 'isomorphic-dompurify'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
-import { queryClient } from '../../../_app'
+import { queryClient } from '../../../app'
 
 const converter = new Converter()
 

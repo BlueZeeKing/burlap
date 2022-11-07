@@ -5,7 +5,7 @@ import Loader from '../components/loader'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
 import { getData } from '../lib/fetch'
-import { queryClient } from './_app'
+import { queryClient } from './app'
 import { Page, Course, Module, Assignment, Tab, DashboardCourse } from '../types/api'
 import PrefetchWrapper from '../components/prefetcher'
 import { LinkBox, LinkOverlay } from '@chakra-ui/react'

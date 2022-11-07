@@ -2,7 +2,7 @@ import { Avatar, Badge } from '@chakra-ui/react'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { getData } from '../lib/fetch'
-import { queryClient } from '../pages/_app'
+import { queryClient } from '../pages/app'
 import { User, Unread, DashboardCourse } from '../types/api'
 import PrefetchWrapper from './prefetcher'
 

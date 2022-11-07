@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { NextRouter, useRouter } from 'next/router'
 import { getData } from '../lib/fetch'
 import { ItemWrapper } from '../pages/courses/[course]/modules'
-import { queryClient } from '../pages/_app'
+import { queryClient } from '../pages/app'
 import { Assignment, Item, Page, File } from '../types/api'
 import PrefetchWrapper from './prefetcher'
 
