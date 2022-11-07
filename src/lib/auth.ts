@@ -1,26 +1,7 @@
 export async function saveKey(key: string): Promise<void> {
-  const { appDir, join } = await import('@tauri-apps/api/path')
-  const { writeTextFile, createDir } = await import('@tauri-apps/api/fs')
-
-  try {
-    await createDir(await appDir())
-  } finally {
-    await writeTextFile(await join(await appDir(), 'apikey.txt'), key)
-  }
+  window.electronAPI.saveKey(key)
 }
 
-export async function getKey(): Promise<string> {
-  const { appDir, join } = await import('@tauri-apps/api/path')
-  const { readTextFile } = await import('@tauri-apps/api/fs')
-
-  return await readTextFile(await join(await appDir(), 'apikey.txt'))
-}
-
-export async function loggedIn() {
-  try {
-    await getKey()
-  } catch (e) {
-    return false
-  }
-  return true
+export async function getKey(): Promise<string | undefined> {
+  return window.electronAPI.getKey()
 }

@@ -1,13 +1,11 @@
 import { Button, Input } from '@chakra-ui/react'
 
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { saveKey } from '../lib/auth'
 
-export default function Start() {
+export default function Start(props: { onComplete: () => void }) {
   const [key, setKey] = useState('')
-  const nav = useRouter()
 
   return (
     <div className="w-screen h-screen grid place-content-center p-16">
@@ -24,7 +22,7 @@ export default function Start() {
             mt="2"
             onClick={async () => {
               saveKey(key)
-              nav.push('/')
+              props.onComplete()
             }}
           >
             Submit

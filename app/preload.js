@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  getData: state => ipcRenderer.send('req-data', state),
-  onData: callback => ipcRenderer.on('res-data', callback),
+  getKey: () => ipcRenderer.invoke('get-key'),
+  saveKey: key => ipcRenderer.send('save-key', key),
 })
