@@ -8,7 +8,7 @@ import Header from '../../components/header'
 import Loader from '../../components/loader'
 import { parseDate } from '../../lib/date'
 import { getData, getInfiniteData } from '../../lib/fetch'
-import { User } from '../../types/api'
+import { User } from '../../types'
 
 interface Conversation {
   id: number

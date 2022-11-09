@@ -5,7 +5,7 @@ import Sanitizer from '../../../../components/sanitize'
 import { useBreadcrumb } from '../../../../lib/breadcrumb'
 import { parseDate } from '../../../../lib/date'
 import { getData } from '../../../../lib/fetch'
-import { Announcement } from '../../../../types/api'
+import { Announcement } from '../../../../types'
 
 export default function AnnouncementPage() {
   const router = useRouter()

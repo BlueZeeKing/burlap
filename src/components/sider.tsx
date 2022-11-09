@@ -7,7 +7,7 @@ import { NextRouter, useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { getData, getInfiniteData } from '../lib/fetch'
 import { queryClient } from '../pages/app'
-import { Tab, Module, Assignment, Announcement, Discussion } from '../types/api'
+import { Tab, Module, Assignment, Announcement, Discussion } from '../types'
 import PrefetchWrapper from './prefetcher'
 import Resizer from './resizer'
 

@@ -4,7 +4,7 @@ import { CourseLayout } from '../../../components/layout'
 import Sanitizer from '../../../components/sanitize'
 import { useBreadcrumb } from '../../../lib/breadcrumb'
 import { getData } from '../../../lib/fetch'
-import { Page } from '../../../types/api'
+import { Page } from '../../../types'
 
 export default function Home() {
   const router = useRouter()

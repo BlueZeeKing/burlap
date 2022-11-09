@@ -19,7 +19,7 @@ import { NextRouter, useRouter } from 'next/router'
 import { getData, getInfiniteData } from '../../../lib/fetch'
 import { CourseLayout } from '../../../components/layout'
 
-import { Module, Item, Type, Assignment, Discussion, Page } from '../../../types/api'
+import { Module, Item, Type, Assignment, Discussion, Page } from '../../../types'
 import { parseDate } from '../../../lib/date'
 import PrefetchWrapper from '../../../components/prefetcher'
 import { queryClient } from '../../app'

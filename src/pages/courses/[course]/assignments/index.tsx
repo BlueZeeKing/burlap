@@ -6,7 +6,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { CourseLayout } from '../../../../components/layout'
 import { useBreadcrumb } from '../../../../lib/breadcrumb'
 import { getInfiniteData } from '../../../../lib/fetch'
-import { Assignment } from '../../../../types/api'
+import { Assignment } from '../../../../types'
 
 export default function AssignmentList() {
   const router = useRouter()

@@ -4,7 +4,7 @@ import { NextRouter, useRouter } from 'next/router'
 import { getData } from '../lib/fetch'
 import { ItemWrapper } from '../pages/courses/[course]/modules'
 import { queryClient } from '../pages/app'
-import { Assignment, Item, Page, File } from '../types/api'
+import { Assignment, Item, Page, File } from '../types'
 import PrefetchWrapper from './prefetcher'
 
 interface Sequence {

@@ -6,7 +6,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { CourseLayout } from '../../../../components/layout'
 import { useBreadcrumb } from '../../../../lib/breadcrumb'
 import { getInfiniteData } from '../../../../lib/fetch'
-import { Discussion } from '../../../../types/api'
+import { Discussion } from '../../../../types'
 
 export default function DiscussionList() {
   const router = useRouter()

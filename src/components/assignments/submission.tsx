@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faClose, faPaperPlane, faUpload } from '@fortawesome/free-solid-svg-icons'
-import { Assignment, SubmissionType } from '../../types/api'
+import { Assignment, SubmissionType } from '../../types'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import DOMPurify from 'isomorphic-dompurify'

@@ -4,7 +4,7 @@ import { CourseLayout } from '../../../components/layout'
 import Sanitizer from '../../../components/sanitize'
 import { useBreadcrumb } from '../../../lib/breadcrumb'
 import { getData } from '../../../lib/fetch'
-import { Course } from '../../../types/api'
+import { Course } from '../../../types'
 
 export default function Syllabus() {
   const router = useRouter()

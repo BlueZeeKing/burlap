@@ -4,7 +4,7 @@ import { CourseLayout } from '../../../../components/layout'
 
 import { pdfjs, Document, Page } from 'react-pdf'
 import { getData } from '../../../../lib/fetch'
-import { File } from '../../../../types/api'
+import { File } from '../../../../types'
 import { parseDate } from '../../../../lib/date'
 import { Button } from '@chakra-ui/react'
 import { save } from '@tauri-apps/api/dialog'

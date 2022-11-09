@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { getData } from '../../../lib/fetch'
-import { Course } from '../../../types/api'
+import { Course } from '../../../types'
 import AssignmentList from './assignments'
 import Wiki from './home'
 import Syllabus from './syllabus'

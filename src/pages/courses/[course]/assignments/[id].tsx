@@ -5,7 +5,7 @@ import Sanitizer from '../../../../components/sanitize'
 import SequenceButtons from '../../../../components/sequencebuttons'
 import { parseDate } from '../../../../lib/date'
 import { getData } from '../../../../lib/fetch'
-import { Assignment } from '../../../../types/api'
+import { Assignment } from '../../../../types'
 
 import { useRef, useState } from 'react'
 

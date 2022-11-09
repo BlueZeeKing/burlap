@@ -5,8 +5,9 @@ import { ChakraProvider } from '@chakra-ui/react'
 import Start from './start'
 import { useEffect, useState } from 'react'
 import { getKey } from '../lib/auth'
+import Main from './main'
 
-function Main() {
+function App() {
   const [isLoggedIn, setLoggedIn] = useState(true)
 
   useEffect(() => {
@@ -15,9 +16,9 @@ function Main() {
 
   return (
     <ChakraProvider>
-      {isLoggedIn ? <h1>hi</h1> : <Start onComplete={() => setLoggedIn(true)} />}
+      {isLoggedIn ? <Main /> : <Start onComplete={() => setLoggedIn(true)} />}
     </ChakraProvider>
   )
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(<Main />)
+ReactDOM.createRoot(document.getElementById('root')!).render(<App />)

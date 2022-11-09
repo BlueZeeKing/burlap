@@ -1,37 +1,12 @@
-import Link from 'next/link'
-import Header from '../components/header'
-import Loader from '../components/loader'
-
-import { useMutation, useQuery } from '@tanstack/react-query'
-
-import { getData } from '../lib/fetch'
-import { queryClient } from './app'
-import { Page, Course, Module, Assignment, Tab, DashboardCourse } from '../types/api'
+import { DashboardCourse } from '../types'
 import PrefetchWrapper from '../components/prefetcher'
 import { LinkBox, LinkOverlay } from '@chakra-ui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons'
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Body, fetch } from '@tauri-apps/api/http'
-import { getKey } from '../lib/auth'
 
 const MotionLinkBox = motion(LinkBox)
-
-export default function App() {
-  const { data, isSuccess } = useQuery(
-    ['dashboard'],
-    async () => await getData<DashboardCourse[]>('dashboard/dashboard_cards')
-  )
-
-  return (
-    <div>
-      <Header />
-
-      {isSuccess ? <AppView data={data} /> : <Loader />}
-    </div>
-  )
-}
 
 interface MovingCourseData {
   id: string
@@ -43,35 +18,10 @@ interface MovingCourseData {
   offsetY: number
 }
 
-function AppView(props: { data: DashboardCourse[] }) {
+export default function Dashboard(props: { data: DashboardCourse[] }) {
   const [movingCourse, setMovingCourse] = useState<MovingCourseData | undefined>()
   const ref = useRef<HTMLDivElement>(null)
   const [order, setOrder] = useState<string[]>(props.data.map(item => item.assetString))
-
-  const mutation = useMutation(async (order: string[]) => {
-    // FIXME: creates 500 error
-    const key = await getKey()
-    const res = await fetch(
-      'https://apsva.instructure.com/api/v1/users/self/dashboard_positions/',
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${key}`,
-          'content-type': 'application/json;charset=UTF-8',
-        },
-        body: Body.json(
-          Object.assign(
-            {},
-            ...order.map((item, index) => ({
-              [`dashboard_positions[${item}]`]: index,
-            }))
-          )
-        ),
-      }
-    )
-
-    console.log(res.status)
-  })
 
   const move = (index: number, id: string) => {
     let copy: string[] = JSON.parse(JSON.stringify(order))
@@ -81,8 +31,6 @@ function AppView(props: { data: DashboardCourse[] }) {
 
     setOrder(copy)
   }
-
-  //console.log(mutation.status)
 
   return (
     <main
@@ -106,9 +54,7 @@ function AppView(props: { data: DashboardCourse[] }) {
           item={props.data.find(item => item.assetString == movingCourse.id)}
           data={movingCourse}
           update={move}
-          onComplete={() => {
-            mutation.mutate(order)
-          }}
+          onComplete={() => {}}
         />
       ) : (
         ''
@@ -128,7 +74,7 @@ function CourseItem(props: {
 
   return (
     <MotionLinkBox layout key={item.id} as="article">
-      <PrefetchWrapper prefetch={() => prefetch(item)} className="h-full">
+      <PrefetchWrapper prefetch={() => {}} className="h-full">
         <div
           className={`h-40 p-8 bg-white dark:bg-zinc-800 rounded border-zinc-300 dark:border-zinc-700 border cursor-pointer relative set-opacity-wrapper ${
             props.clicked ? 'opacity-50' : 'opacity-100'
@@ -158,9 +104,7 @@ function CourseItem(props: {
             <FontAwesomeIcon icon={faGripVertical} className="text-zinc-600" />
           </div>
           <h2 className={`text-xl flex flex-row ${props.clicked ? 'opacity-0' : 'opacity-100'}`}>
-            <Link href={`/courses/${item.id}`} passHref>
-              <LinkOverlay>{item.shortName}</LinkOverlay>
-            </Link>
+            <LinkOverlay>{item.shortName}</LinkOverlay>
           </h2>
           <p
             className={`text-sm text-zinc-500 dark:text-zinc-400 ${
@@ -253,7 +197,7 @@ function MovingCourseItem(props: {
     </div>
   )
 }
-
+/*
 const prefetch = (item: DashboardCourse) => {
   const course: Course = {
     course_code: item.courseCode,
@@ -295,7 +239,7 @@ export function prefectDefaultView(item: Course) {
       )
       return
   }
-}
+}*/
 
 function pauseEvent(e) {
   if (e.stopPropagation) e.stopPropagation()

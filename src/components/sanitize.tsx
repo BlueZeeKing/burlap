@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useRef } from 'react'
 import { sanitize } from 'isomorphic-dompurify'
 import { MutableRefObject } from 'react'
-import { LinkType } from '../types/api'
+import { LinkType } from '../types'
 import { NextRouter, useRouter } from 'next/router'
 
 export default function Sanitizer(props: { html: string; header?: ReactNode; className?: string }) {
