@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons'
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useRouter } from '../lib/context'
 
 const MotionLinkBox = motion(LinkBox)
 
@@ -22,6 +23,8 @@ export default function Dashboard(props: { data: DashboardCourse[] }) {
   const [movingCourse, setMovingCourse] = useState<MovingCourseData | undefined>()
   const ref = useRef<HTMLDivElement>(null)
   const [order, setOrder] = useState<string[]>(props.data.map(item => item.assetString))
+
+  const setRoute = useRouter()
 
   const move = (index: number, id: string) => {
     let copy: string[] = JSON.parse(JSON.stringify(order))
@@ -45,6 +48,12 @@ export default function Dashboard(props: { data: DashboardCourse[] }) {
             item={item}
             setMovingCourse={setMovingCourse}
             clicked={item.assetString == movingCourse?.id}
+            onClick={() =>
+              setRoute({
+                type: 'wiki',
+                url: `courses/${item.id}/front_page`,
+              })
+            }
           />
         ))}
       {movingCourse ? (
@@ -68,6 +77,7 @@ function CourseItem(props: {
   // eslint-disable-next-line unused-imports/no-unused-vars
   setMovingCourse: (a: MovingCourseData) => void
   clicked: boolean
+  onClick: () => void
 }) {
   const { item, setMovingCourse } = props
   const ref = useRef<HTMLDivElement>(null)
@@ -85,6 +95,7 @@ function CourseItem(props: {
       opacity={props.clicked ? '0.5' : '1'}
       className="set-opacity-wrapper"
       ref={ref}
+      onClick={props.onClick}
     >
       <PrefetchWrapper prefetch={() => {}} className="h-full">
         <div

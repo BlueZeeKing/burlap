@@ -2,15 +2,13 @@ import { ReactNode, useEffect, useRef } from 'react'
 import { sanitize } from 'isomorphic-dompurify'
 import { MutableRefObject } from 'react'
 import { LinkType } from '../types'
-import { NextRouter, useRouter } from 'next/router'
 
 export default function Sanitizer(props: { html: string; header?: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
-  const router = useRouter()
 
   useEffect(() => {
-    clean(props.html, ref, router)
-  }, [props.html, router])
+    clean(props.html, ref)
+  }, [props.html])
 
   return (
     <main
@@ -34,7 +32,7 @@ export default function Sanitizer(props: { html: string; header?: ReactNode; cla
   )
 }
 
-export function clean(html: string, ref: MutableRefObject<HTMLDivElement>, router: NextRouter) {
+export function clean(html: string, ref: MutableRefObject<HTMLDivElement>) {
   ref.current.innerHTML = sanitize(html)
   ref.current.querySelectorAll('a').forEach(a => {
     if (a.getAttribute('data-api-returntype') != null) {
@@ -53,9 +51,6 @@ export function clean(html: string, ref: MutableRefObject<HTMLDivElement>, route
       }
       a.onclick = e => {
         e.preventDefault()
-        router.push(a.href, a.href, {
-          shallow: true,
-        })
       }
     } else if (a.href.startsWith('http')) {
       a.target = '_blank'

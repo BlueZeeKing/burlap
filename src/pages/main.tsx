@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react'
 import Header from '../components/header'
 import Loader from '../components/loader'
+import { Provider, State } from '../lib/context'
 import modules from '../lib/modules'
-
-export type Type = 'dashboard' | 'modules'
-
-interface State {
-  type: Type
-  url: string
-}
 
 export default function Main() {
   const [state, setState] = useState<State>({
     type: 'dashboard',
     url: 'dashboard/dashboard_cards',
   })
+
+  function setAndClearState(state: State) {
+    setState(state)
+    setData(undefined)
+  }
 
   const [data, setData] = useState<{ [key: string]: any }>(undefined)
 
@@ -26,18 +25,19 @@ export default function Main() {
   console.log(data)
 
   return (
-    <div>
-      <Header />
-
-      <main>
-        {data != undefined ? (
-          modules
-            .filter(element => !(state.type in element.types))
-            .map(element => element.element(data))
-        ) : (
-          <Loader />
-        )}
-      </main>
-    </div>
+    <Provider value={setAndClearState}>
+      <div>
+        <Header />
+        <main>
+          {data != undefined ? (
+            modules
+              .filter(element => element.types.includes(state.type))
+              .map(element => element.element(data))
+          ) : (
+            <Loader />
+          )}
+        </main>
+      </div>
+    </Provider>
   )
 }

@@ -1,6 +1,7 @@
-import Dashboard from '../pages'
-import { Type } from '../pages/main'
-import { DashboardCourse } from '../types'
+import Dashboard from '../modules/dashboard'
+import { Wiki } from '../modules/wiki'
+import { Type } from '../lib/context'
+import { DashboardCourse, Page } from '../types'
 
 interface Module {
   types: Type[]
@@ -10,8 +11,12 @@ interface Module {
 
 const modules: Module[] = [
   {
-    element: data => <Dashboard data={data as DashboardCourse[]} />,
+    element: data => <Dashboard data={data as DashboardCourse[]} key="1" />,
     types: ['dashboard'],
+  },
+  {
+    element: data => <Wiki data={data as Page} key="2" />,
+    types: ['wiki'],
   },
 ]
 

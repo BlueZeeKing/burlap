@@ -1,9 +1,11 @@
 import { Avatar, Badge, HStack, Box, Center, Square, Link } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
+import { useRouter } from '../lib/context'
 
 export default function Header(props: { text?: string }) {
   const [avatar, setAvatar] = useState('')
   const [unread, setUnread] = useState(0)
+  const setRoute = useRouter()
 
   useEffect(() => {
     window.electronAPI.getAvatar().then(avatar => setAvatar(avatar))
@@ -19,7 +21,15 @@ export default function Header(props: { text?: string }) {
       style={{ gridArea: 'header' }}
     >
       <Center p="4">
-        <Square size="16">
+        <Square
+          size="16"
+          onClick={() =>
+            setRoute({
+              type: 'dashboard',
+              url: 'dashboard/dashboard_cards',
+            })
+          }
+        >
           <Logo className="cursor-pointer" />
         </Square>
       </Center>
