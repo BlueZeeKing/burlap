@@ -1,6 +1,6 @@
 import { DashboardCourse } from '../types'
 import PrefetchWrapper from '../components/prefetcher'
-import { LinkBox, LinkOverlay } from '@chakra-ui/react'
+import { Box, LinkBox, LinkOverlay } from '@chakra-ui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons'
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react'
@@ -34,7 +34,7 @@ export default function Dashboard(props: { data: DashboardCourse[] }) {
 
   return (
     <main
-      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 bg gap-6 p-6 w-screen"
+      className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 bg gap-6 p-6 w-full"
       ref={ref}
     >
       {props.data
@@ -73,47 +73,49 @@ function CourseItem(props: {
   const ref = useRef<HTMLDivElement>(null)
 
   return (
-    <MotionLinkBox layout key={item.id} as="article">
+    <MotionLinkBox
+      layout
+      key={item.id}
+      as="article"
+      height="175px"
+      bg="gray.800"
+      borderRadius="10px"
+      p="6"
+      boxShadow="xl"
+      opacity={props.clicked ? '0.5' : '1'}
+      className="set-opacity-wrapper"
+      ref={ref}
+    >
       <PrefetchWrapper prefetch={() => {}} className="h-full">
         <div
-          className={`h-40 p-8 bg-white dark:bg-zinc-800 rounded border-zinc-300 dark:border-zinc-700 border cursor-pointer relative set-opacity-wrapper ${
-            props.clicked ? 'opacity-50' : 'opacity-100'
+          onMouseDown={e => {
+            console.log(ref)
+            const { left, top, width, height } = ref.current.getBoundingClientRect()
+            setMovingCourse({
+              id: item.assetString,
+              x: left,
+              y: top,
+              width: width,
+              height: height,
+              offsetX: e.clientX - left,
+              offsetY: e.clientY - top,
+            })
+            pauseEvent(e)
+          }}
+          className={`${
+            props.clicked ? '' : 'set-opacity'
+          } absolute z-50 left-2 top-[50%] -translate-y-[50%] opacity-0 transition-opacity ${
+            props.clicked ? 'cursor-grabbing' : 'cursor-grab'
           }`}
-          ref={ref}
         >
-          <div
-            onMouseDown={e => {
-              const { left, top, width, height } = ref.current.getBoundingClientRect()
-              setMovingCourse({
-                id: item.assetString,
-                x: left,
-                y: top,
-                width: width,
-                height: height,
-                offsetX: e.clientX - left,
-                offsetY: e.clientY - top,
-              })
-              pauseEvent(e)
-            }}
-            className={`${
-              props.clicked ? '' : 'set-opacity'
-            } absolute z-50 left-3 top-[50%] -translate-y-[50%] opacity-0 transition-opacity ${
-              props.clicked ? 'cursor-grabbing' : 'cursor-grab'
-            }`}
-          >
-            <FontAwesomeIcon icon={faGripVertical} className="text-zinc-600" />
-          </div>
-          <h2 className={`text-xl flex flex-row ${props.clicked ? 'opacity-0' : 'opacity-100'}`}>
-            <LinkOverlay>{item.shortName}</LinkOverlay>
-          </h2>
-          <p
-            className={`text-sm text-zinc-500 dark:text-zinc-400 ${
-              props.clicked ? 'opacity-0' : 'opacity-100'
-            }`}
-          >
-            {item.courseCode}
-          </p>
+          <FontAwesomeIcon icon={faGripVertical} className="text-zinc-600" />
         </div>
+        <h2 className={`text-xl ${props.clicked ? 'opacity-0' : 'opacity-100'}`}>
+          <LinkOverlay>{item.shortName}</LinkOverlay>
+        </h2>
+        <p className={`text-sm text-zinc-400 pt-2 ${props.clicked ? 'opacity-0' : 'opacity-100'}`}>
+          {item.courseCode}
+        </p>
       </PrefetchWrapper>
     </MotionLinkBox>
   )
@@ -180,21 +182,26 @@ function MovingCourseItem(props: {
   })
 
   return (
-    <div
-      style={{
-        top: pos[1],
-        left: pos[0],
-        width: props.data.width,
-        height: props.data.height,
-      }}
-      className="p-8 bg-white dark:bg-zinc-800 rounded border-zinc-300 dark:border-zinc-700 border cursor-pointer fixed set-opacity-wrapper"
+    <Box
+      top={pos[1] + 'px'}
+      left={pos[0] + 'px'}
+      w={props.data.width + 'px'}
+      h={props.data.height + 'px'}
+      height="175px"
+      bg="gray.800"
+      borderRadius="10px"
+      p="6"
+      boxShadow="xl"
+      position="fixed"
+      cursor="grabbing"
+      className="set-opacity-wrapper"
     >
       <div className="set-opacity absolute z-50 left-3 top-[50%] -translate-y-[50%] opacity-0 transition-opacity cursor-grabbing">
         <FontAwesomeIcon icon={faGripVertical} className="text-zinc-600" />
       </div>
       <h2 className="text-xl flex flex-row">{props.item.shortName}</h2>
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">{props.item.courseCode}</p>
-    </div>
+      <p className="text-sm text-zinc-400 pt-2">{props.item.courseCode}</p>
+    </Box>
   )
 }
 /*

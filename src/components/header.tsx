@@ -1,4 +1,4 @@
-import { Avatar, Badge } from '@chakra-ui/react'
+import { Avatar, Badge, HStack, Box, Center, Square, Link } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 
 export default function Header(props: { text?: string }) {
@@ -11,17 +11,22 @@ export default function Header(props: { text?: string }) {
   })
 
   return (
-    <div
-      className="h-24 bg-white dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-700 flex col-span-2 draggable"
+    <HStack
+      height="24"
+      shadow="xl"
+      bg="gray.800"
+      className="draggable"
       style={{ gridArea: 'header' }}
     >
-      <div className="h-full p-4 aspect-square">
-        <Logo className="cursor-pointer" />
-      </div>
+      <Center p="4">
+        <Square size="16">
+          <Logo className="cursor-pointer" />
+        </Square>
+      </Center>
       <h1 className="text-2xl grid content-center">{props.text}</h1>
       <div className="flex-grow"></div>
-      <div className="h-full grid content-center px-5">
-        <span className="text-blue-500 dark:text-blue-400 cursor-pointer hover:underline relative">
+      <Center px="4" pr="0">
+        <Link textColor="blue.400">
           Messages
           {unread > 0 ? (
             <Badge ml="1" colorScheme="red">
@@ -30,12 +35,12 @@ export default function Header(props: { text?: string }) {
           ) : (
             ''
           )}
-        </span>
-      </div>
-      <div className="grid content-center mr-4">
-        <Avatar ml="2" src={avatar} />
-      </div>
-    </div>
+        </Link>
+      </Center>
+      <Center px="4">
+        <Avatar src={avatar} />
+      </Center>
+    </HStack>
   )
 }
 

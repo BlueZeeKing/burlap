@@ -2,19 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html,
-  body {
-    @apply !bg-zinc-200 dark:!bg-zinc-900;
-  }
-}
-
-@layer components {
-  .bg {
-    @apply bg-zinc-200 dark:bg-zinc-900;
-  }
-}
-
 .screenreader-only {
   display: none;
 }
@@ -25,7 +12,7 @@
     'sider main';
 }
 
-.set-opacity-wrapper:hover > .set-opacity {
+.set-opacity-wrapper:hover > div > .set-opacity {
   opacity: 1;
 }
 
