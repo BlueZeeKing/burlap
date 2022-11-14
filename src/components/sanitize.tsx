@@ -2,57 +2,56 @@ import { ReactNode, useEffect, useRef } from 'react'
 import { sanitize } from 'isomorphic-dompurify'
 import { MutableRefObject } from 'react'
 import { LinkType } from '../types'
+import { Type, useRouter } from '../lib/context'
+import { Box } from '@chakra-ui/react'
+
+const courseRegex = new RegExp('/courses/(\\d)/')
 
 export default function Sanitizer(props: { html: string; header?: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
+  const { setRoute } = useRouter()
 
   useEffect(() => {
-    clean(props.html, ref)
-  }, [props.html])
+    clean(props.html, ref, setRoute)
+  }, [props.html, setRoute])
 
   return (
-    <main
-      className={
-        'bg p-6 flex flex-col space-y-6 place-items-center ' +
-        (props.className ? props.className : '')
-      }
+    <Box
+      bg="gray.800"
+      boxShadow="lg"
+      rounded="lg"
+      className="prose prose-invert p-8 lg:prose-lg w-full overflow-auto h-full"
     >
-      <div className="prose dark:prose-invert bg-white dark:bg-zinc-800 p-8 lg:prose-lg max-w-[75ch] w-full rounded">
-        {props.header != null ? (
-          <>
-            {props.header}
-            <hr className="!m-8" />
-          </>
-        ) : (
-          ''
-        )}
-        <div ref={ref} />
-      </div>
-    </main>
+      {props.header != null ? (
+        <>
+          {props.header}
+          <hr className="!m-8" />
+        </>
+      ) : (
+        ''
+      )}
+      <div ref={ref} />
+    </Box>
   )
 }
 
-export function clean(html: string, ref: MutableRefObject<HTMLDivElement>) {
+export function clean(html: string, ref: MutableRefObject<HTMLDivElement>, setRoute) {
   ref.current.innerHTML = sanitize(html)
   ref.current.querySelectorAll('a').forEach(a => {
     if (a.getAttribute('data-api-returntype') != null) {
       const type = a.getAttribute('data-api-returntype') as LinkType
-      const url = new URL(a.getAttribute('href'))
-      switch (type) {
-        case 'Module':
-          a.href = url.pathname.split('/').slice(0, 4).join('/')
-          break
-        case 'File':
-          a.href = url.pathname.replace('/download', '')
-          break
-        default:
-          a.href = url.pathname
-          break
-      }
       a.onclick = e => {
         e.preventDefault()
+        let url = a.getAttribute('data-api-endpoint')
+
+        setRoute({
+          type: convertType(type),
+          url: new URL(url).pathname.split('/').slice(3).join('/'),
+          course: courseRegex.test(url) ? courseRegex.exec(url)[1] : undefined,
+          sidebar: courseRegex.test(url),
+        })
       }
-    } else if (a.href.startsWith('http')) {
+    } else {
       a.target = '_blank'
       a.rel = 'noreferrer'
     }
@@ -110,4 +109,23 @@ export function clean(html: string, ref: MutableRefObject<HTMLDivElement>) {
 
 function isLink(e: HTMLElement): boolean {
   return e instanceof HTMLAnchorElement || e.firstChild instanceof HTMLAnchorElement
+}
+
+function convertType(type: LinkType): Type {
+  switch (type) {
+    case 'Assignment':
+      return 'assignment'
+    case 'Discussion':
+      return 'discussion'
+    case 'File':
+      return 'file'
+    case 'Module':
+      return 'modules'
+    case 'Page':
+      return 'page'
+    case 'Quiz':
+      return 'quiz'
+    default:
+      return 'unknown'
+  }
 }

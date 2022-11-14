@@ -102,7 +102,7 @@ ipcMain.on('save-key', (_event, key) => {
 
 ipcMain.handle('get-data', async (_event, url: string) => {
   const data = await queryClient.fetchQuery(
-    [url.split('/')],
+    url.split('/'),
     async () => {
       const data = await axios.get(`https://apsva.instructure.com/api/v1/${url}`, {
         headers: {

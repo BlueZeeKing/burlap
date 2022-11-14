@@ -24,7 +24,7 @@ export default function Dashboard(props: { data: DashboardCourse[] }) {
   const ref = useRef<HTMLDivElement>(null)
   const [order, setOrder] = useState<string[]>(props.data.map(item => item.assetString))
 
-  const setRoute = useRouter()
+  const { setRoute } = useRouter()
 
   const move = (index: number, id: string) => {
     let copy: string[] = JSON.parse(JSON.stringify(order))
@@ -52,6 +52,8 @@ export default function Dashboard(props: { data: DashboardCourse[] }) {
               setRoute({
                 type: 'wiki',
                 url: `courses/${item.id}/front_page`,
+                course: item.id,
+                sidebar: true,
               })
             }
           />
@@ -91,7 +93,7 @@ function CourseItem(props: {
       bg="gray.800"
       borderRadius="10px"
       p="6"
-      boxShadow="xl"
+      boxShadow="lg"
       opacity={props.clicked ? '0.5' : '1'}
       className="set-opacity-wrapper"
       ref={ref}
@@ -202,7 +204,7 @@ function MovingCourseItem(props: {
       bg="gray.800"
       borderRadius="10px"
       p="6"
-      boxShadow="xl"
+      boxShadow="lg"
       position="fixed"
       cursor="grabbing"
       className="set-opacity-wrapper"

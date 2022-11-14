@@ -146,7 +146,7 @@ electron_1.ipcMain.handle('get-data', function (_event, url) { return __awaiter(
     var data;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, queryClient.fetchQuery([url.split('/')], function () { return __awaiter(void 0, void 0, void 0, function () {
+            case 0: return [4 /*yield*/, queryClient.fetchQuery(url.split('/'), function () { return __awaiter(void 0, void 0, void 0, function () {
                     var data;
                     return __generator(this, function (_a) {
                         switch (_a.label) {

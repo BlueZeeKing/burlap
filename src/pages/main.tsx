@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Header from '../components/header'
 import Loader from '../components/loader'
+import Sidebar from '../components/sider'
 import { Provider, State } from '../lib/context'
 import modules from '../lib/modules'
 
@@ -17,22 +18,28 @@ export default function Main() {
 
   const [data, setData] = useState<{ [key: string]: any }>(undefined)
 
+  const elements = useMemo(
+    () => modules.filter(element => element.types.includes(state.type)),
+    [state.type]
+  )
+
   useEffect(() => {
     // FIXME: add abort
     window.electronAPI.getData(state.url).then(data => setData(data))
   }, [state.url, state.type])
 
+  const ref = useRef<HTMLDivElement>(null)
+
   console.log(data)
 
   return (
-    <Provider value={setAndClearState}>
-      <div>
+    <Provider value={{ state: state, setRoute: setAndClearState }}>
+      <div className="h-screen">
         <Header />
-        <main>
+        <main className="h-full mt-24 flex" ref={ref}>
+          {state.sidebar ? <Sidebar /> : null}
           {data != undefined ? (
-            modules
-              .filter(element => element.types.includes(state.type))
-              .map(element => element.element(data))
+            elements.map(element => <div key={element.id}>{element.element(data)}</div>)
           ) : (
             <Loader />
           )}

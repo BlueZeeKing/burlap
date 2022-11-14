@@ -5,7 +5,7 @@ import { useRouter } from '../lib/context'
 export default function Header(props: { text?: string }) {
   const [avatar, setAvatar] = useState('')
   const [unread, setUnread] = useState(0)
-  const setRoute = useRouter()
+  const { setRoute } = useRouter()
 
   useEffect(() => {
     window.electronAPI.getAvatar().then(avatar => setAvatar(avatar))
@@ -15,10 +15,14 @@ export default function Header(props: { text?: string }) {
   return (
     <HStack
       height="24"
-      shadow="xl"
+      shadow="lg"
       bg="gray.800"
       className="draggable"
       style={{ gridArea: 'header' }}
+      position="fixed"
+      width="100vw"
+      top="0"
+      zIndex="50"
     >
       <Center p="4">
         <Square
