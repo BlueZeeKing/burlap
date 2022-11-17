@@ -27,7 +27,6 @@ export function CourseLayout(props: { isSuccess: boolean; children: ReactNode })
 
       <Sidebar sidebarWidth={width} setSidebarWidth={setWidth} />
       <div className="bg overflow-scroll" style={{ gridArea: 'main' }}>
-        <BreadcrumbElement />
         {props.isSuccess ? props.children : <Loader />}
       </div>
     </div>

@@ -125,7 +125,12 @@ function TextTab(props: { course: string; assignment: string }) {
           }}
         />
       ) : (
-        <Textarea value={text} onChange={e => setText(e.target.value)} resize="none" flexGrow="1" />
+        <Textarea
+          value={text}
+          onChange={e => setText(e.target.value)}
+          resize="vertical"
+          flexGrow="1"
+        />
       )}
       <div>
         <Button
